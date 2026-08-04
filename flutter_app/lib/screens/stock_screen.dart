@@ -228,55 +228,123 @@ class _StockScreenState extends State<StockScreen> {
     final priceCtrl = TextEditingController(text: productToEdit?.price.toInt().toString() ?? '');
     final stockCtrl = TextEditingController(text: productToEdit?.stock.toString() ?? '');
     final imgCtrl = TextEditingController(text: productToEdit?.image ?? '');
+    final descCtrl = TextEditingController(text: productToEdit?.description ?? '');
     String selectedCat = productToEdit?.category ?? 'Kopi';
+    bool isCustom = !provider.existingCategories.contains(selectedCat);
 
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(productToEdit == null ? 'Tambah Produk' : 'Edit Produk'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nama Produk')),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: selectedCat,
-                  items: provider.existingCategories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                  onChanged: (val) => setDialogState(() => selectedCat = val!),
-                  decoration: const InputDecoration(labelText: 'Kategori'),
-                ),
-                const SizedBox(height: 12),
-                TextField(controller: priceCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Harga', prefixText: 'Rp ')),
-                const SizedBox(height: 12),
-                TextField(controller: stockCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Stok')),
-                const SizedBox(height: 12),
-                TextField(controller: imgCtrl, decoration: const InputDecoration(labelText: 'URL Gambar (Opsional)')),
-              ],
+        builder: (context, setDialogState) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            width: double.infinity,
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+            padding: const EdgeInsets.all(24),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(productToEdit == null ? 'Tambah Produk' : 'Edit Produk', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                      IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
+                    ],
+                  ),
+                  const Divider(),
+                  const SizedBox(height: 16),
+
+                  _buildLabel('Nama Produk'),
+                  TextField(controller: nameCtrl, decoration: _inputDeco('cth. Latte Special')),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildLabel('Kategori'),
+                      TextButton(
+                        onPressed: () => setDialogState(() => isCustom = !isCustom),
+                        child: Text(isCustom ? 'Pilih Daftar' : '+ Ketik Manual', style: const TextStyle(fontSize: 11)),
+                      ),
+                    ],
+                  ),
+                  if (!isCustom)
+                    DropdownButtonFormField<String>(
+                      value: provider.existingCategories.contains(selectedCat) ? selectedCat : provider.existingCategories.first,
+                      items: provider.existingCategories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                      onChanged: (val) => setDialogState(() => selectedCat = val!),
+                      decoration: _inputDeco(''),
+                    )
+                  else
+                    TextField(
+                      onChanged: (v) => selectedCat = v,
+                      decoration: _inputDeco('Tulis kategori baru...'),
+                    ),
+
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildLabel('Harga (Rp)'), TextField(controller: priceCtrl, keyboardType: TextInputType.number, decoration: _inputDeco('25000'))])),
+                      const SizedBox(width: 12),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildLabel('Stok'), TextField(controller: stockCtrl, keyboardType: TextInputType.number, decoration: _inputDeco('50'))])),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  _buildLabel('URL Gambar Produk'),
+                  TextField(controller: imgCtrl, decoration: _inputDeco('https://...')),
+                  const SizedBox(height: 16),
+
+                  _buildLabel('Deskripsi'),
+                  TextField(controller: descCtrl, maxLines: 2, decoration: _inputDeco('Deskripsi singkat...')),
+
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal'))),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white),
+                          onPressed: () {
+                            if (nameCtrl.text.isEmpty || priceCtrl.text.isEmpty) return;
+                            provider.saveProduct(Product(
+                              id: productToEdit?.id ?? '',
+                              name: nameCtrl.text,
+                              category: selectedCat,
+                              price: double.tryParse(priceCtrl.text) ?? 0,
+                              stock: int.tryParse(stockCtrl.text) ?? 0,
+                              image: imgCtrl.text,
+                              description: descCtrl.text,
+                            ));
+                            Navigator.pop(ctx);
+                          },
+                          child: const Text('Simpan'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-            ElevatedButton(
-              onPressed: () {
-                if (nameCtrl.text.isEmpty || priceCtrl.text.isEmpty) return;
-                provider.saveProduct(Product(
-                  id: productToEdit?.id ?? '',
-                  name: nameCtrl.text,
-                  category: selectedCat,
-                  price: double.tryParse(priceCtrl.text) ?? 0,
-                  stock: int.tryParse(stockCtrl.text) ?? 0,
-                  image: imgCtrl.text,
-                  description: '',
-                ));
-                Navigator.pop(ctx);
-              },
-              child: const Text('Simpan'),
-            ),
-          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)));
+  }
+
+  InputDecoration _inputDeco(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.grey)),
     );
   }
 }

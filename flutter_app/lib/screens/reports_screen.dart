@@ -22,12 +22,6 @@ class ReportsScreen extends StatelessWidget {
       (sum, trx) => sum + trx.total,
     );
 
-    final totalItemsSold = activeTransactions.fold(
-      0,
-      (sum, trx) =>
-          sum + trx.items.fold(0, (iSum, item) => iSum + item.quantity),
-    );
-
     final recentTransactions = provider.transactions.take(5).toList();
 
     return Scaffold(

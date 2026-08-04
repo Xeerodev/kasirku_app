@@ -173,92 +173,82 @@ class _HistoryScreenState extends State<HistoryScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         child: Container(
           width: double.infinity,
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.75),
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Detail Faktur', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                  IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
-                ],
-              ),
-              const Divider(),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(tx.invoiceNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text(tx.status, style: const TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.bold)),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text('Kasir: ${tx.cashierName}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-              Text('Waktu: ${tx.timeString} | Pembayaran: ${tx.paymentMethod}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-              const SizedBox(height: 20),
-              const Text('Rincian Item:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-              const SizedBox(height: 8),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: tx.items.length,
-                  itemBuilder: (context, i) {
-                    final item = tx.items[i];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(child: Text('${item.quantity}x ${item.product.name}', style: const TextStyle(fontSize: 12))),
-                          Text(currencyFormatter.format(item.subtotal), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    );
-                  },
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Detail Faktur', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                    IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
+                  ],
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0),
-                child: Divider(height: 1, thickness: 1, color: Colors.grey),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Total Bayar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text(currencyFormatter.format(tx.total), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF0D47A1))),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.print, size: 16),
-                      label: const Text('Cetak Ulang', style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
-                    ),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                // Paper Receipt Simulation
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: Colors.white, border: Border.all(color: Colors.grey.shade200), borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)]),
+                  child: Column(
+                    children: [
+                      Text(provider.storeProfile.name.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87)),
+                      Text(provider.storeProfile.address, style: const TextStyle(fontSize: 8, color: Colors.grey), textAlign: TextAlign.center),
+                      const Divider(height: 24, thickness: 1, color: Colors.black12),
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('No: ${tx.invoiceNumber}', style: const TextStyle(fontSize: 9, color: Colors.black87)), Text(tx.status, style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))]),
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Kasir: ${tx.cashierName}', style: const TextStyle(fontSize: 9, color: Colors.black87)), Text(tx.timeString, style: const TextStyle(fontSize: 9, color: Colors.black87))]),
+                      const Divider(height: 24, thickness: 1, color: Colors.black12),
+                      ...tx.items.map((item) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: Text('${item.quantity}x ${item.product.name}', style: const TextStyle(fontSize: 9, color: Colors.black87))),
+                            Text(currencyFormatter.format(item.subtotal), style: const TextStyle(fontSize: 9, color: Colors.black87)),
+                          ],
+                        ),
+                      )),
+                      const Divider(height: 24, thickness: 1, color: Colors.black12),
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black87)), Text(currencyFormatter.format(tx.total), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black87))]),
+                    ],
                   ),
-                  if (tx.status == 'Lunas') ...[
-                    const SizedBox(width: 12),
+                ),
+
+                const SizedBox(height: 24),
+                Row(
+                  children: [
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          provider.toggleRefund(tx.id);
-                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mencetak struk...')));
                         },
-                        icon: const Icon(Icons.assignment_return, size: 16),
-                        label: const Text('Refund', style: TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
+                        icon: const Icon(Icons.print, size: 16),
+                        label: const Text('Cetak Struk', style: TextStyle(fontSize: 12)),
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
                       ),
                     ),
+                    if (tx.status == 'Lunas') ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            provider.toggleRefund(tx.id);
+                            Navigator.pop(ctx);
+                          },
+                          icon: const Icon(Icons.assignment_return, size: 16),
+                          label: const Text('Refund', style: TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),
