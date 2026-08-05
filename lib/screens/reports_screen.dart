@@ -12,8 +12,8 @@ class ReportsScreen extends StatelessWidget {
     final provider = Provider.of<PosProvider>(context);
     final isDark = provider.isDarkMode;
     final currencyFormatter = NumberFormat.currency(
-      locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
-      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
+      locale: 'id_ID',
+      symbol: 'Rp ',
       decimalDigits: 0,
     );
 
@@ -25,6 +25,7 @@ class ReportsScreen extends StatelessWidget {
     );
 
     final recentTransactions = provider.transactions.take(5).toList();
+    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
@@ -47,9 +48,12 @@ class ReportsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            Text(
-              provider.storeProfile.name,
-              style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 18),
+            Expanded(
+              child: Text(
+                provider.storeProfile.name,
+                style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 18),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
@@ -59,9 +63,11 @@ class ReportsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              spacing: 16,
+              runSpacing: 16,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,6 +83,7 @@ class ReportsScreen extends StatelessWidget {
                   ],
                 ),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildIconButton(Icons.picture_as_pdf, 'PDF', () => _simulateExport(context, 'PDF', provider), isDark),
                     const SizedBox(width: 8),
@@ -87,36 +94,38 @@ class ReportsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Bento Grid
-            GridView.count(
-              crossAxisCount: MediaQuery.of(context).size.width > 900 ? 3 : (MediaQuery.of(context).size.width > 600 ? 2 : 1),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.8,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              children: [
-                _buildBentoCard(
-                  title: provider.tr('total_revenue'),
-                  value: currencyFormatter.format(totalRevenue),
-                  subtitle: provider.language == 'Indonesia' ? '+14.2% dari kemarin' : '+14.2% from yesterday',
-                  icon: Icons.payments,
-                  color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
-                  textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
-                  isDark: isDark,
-                ),
-                _buildBentoCard(
-                  title: provider.tr('total_transactions'),
-                  value: '${activeTransactions.length} ${provider.language == 'Indonesia' ? 'Transaksi' : 'Transactions'}',
-                  subtitle: '${provider.language == 'Indonesia' ? 'Rata-rata' : 'Average'} ${currencyFormatter.format(activeTransactions.isEmpty ? 0 : totalRevenue / activeTransactions.length)} / trx',
-                  icon: Icons.receipt_long,
-                  color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
-                  textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
-                  isDark: isDark,
-                ),
-                _buildTopProductCard(provider, currencyFormatter),
-              ],
-            ),
+            // Bento Grid - More Responsive
+            LayoutBuilder(builder: (context, constraints) {
+              return GridView.count(
+                crossAxisCount: width > 900 ? 3 : (width > 600 ? 2 : 1),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: width > 600 ? 1.8 : 2.5,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  _buildBentoCard(
+                    title: provider.tr('total_revenue'),
+                    value: currencyFormatter.format(totalRevenue),
+                    subtitle: provider.language == 'Indonesia' ? '+14.2% dari kemarin' : '+14.2% from yesterday',
+                    icon: Icons.payments,
+                    color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
+                    textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
+                    isDark: isDark,
+                  ),
+                  _buildBentoCard(
+                    title: provider.tr('total_transactions'),
+                    value: '${activeTransactions.length} ${provider.language == 'Indonesia' ? 'Transaksi' : 'Transactions'}',
+                    subtitle: '${provider.language == 'Indonesia' ? 'Rata-rata' : 'Average'} ${currencyFormatter.format(activeTransactions.isEmpty ? 0 : totalRevenue / activeTransactions.length)} / trx',
+                    icon: Icons.receipt_long,
+                    color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
+                    textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
+                    isDark: isDark,
+                  ),
+                  _buildTopProductCard(provider, currencyFormatter),
+                ],
+              );
+            }),
 
             const SizedBox(height: 32),
             Row(
@@ -236,18 +245,18 @@ class ReportsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textColor.withOpacity(0.7))),
+              Flexible(child: Text(title.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textColor.withOpacity(0.7)), overflow: TextOverflow.ellipsis)),
               Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : Colors.white, borderRadius: BorderRadius.circular(12)), child: Icon(icon, color: textColor, size: 20)),
             ],
           ),
           const Spacer(),
-          Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor)),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor))),
           const SizedBox(height: 4),
           Row(
             children: [
               Icon(Icons.trending_up, size: 14, color: isDark ? Colors.greenAccent : Colors.teal.shade700),
               const SizedBox(width: 4),
-              Text(subtitle, style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey.shade700, fontWeight: FontWeight.w500)),
+              Flexible(child: Text(subtitle, style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey.shade700, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis)),
             ],
           ),
         ],
@@ -271,23 +280,25 @@ class ReportsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(provider.tr('top_product'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.white38 : Colors.grey)),
+              Flexible(child: Text(provider.tr('top_product'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.white38 : Colors.grey), overflow: TextOverflow.ellipsis)),
               const Icon(Icons.star, color: Colors.amber, size: 20),
             ],
           ),
           const SizedBox(height: 8),
-          Text('Latte', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87), maxLines: 1),
+          Text('Latte', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87), maxLines: 1, overflow: TextOverflow.ellipsis),
           const Spacer(),
           Row(
             children: [
               Container(width: 40, height: 40, decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(10)), child: Icon(Icons.image, color: isDark ? Colors.white24 : Colors.grey, size: 20)),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(provider.language == 'Indonesia' ? 'Total Terjual' : 'Total Sold', style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
-                  Text('48 ${provider.language == 'Indonesia' ? 'porsi' : 'servings'}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : Colors.blue.shade700)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(provider.language == 'Indonesia' ? 'Total Terjual' : 'Total Sold', style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey), overflow: TextOverflow.ellipsis),
+                    Text('48 ${provider.language == 'Indonesia' ? 'porsi' : 'servings'}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : Colors.blue.shade700), overflow: TextOverflow.ellipsis),
+                  ],
+                ),
               )
             ],
           ),

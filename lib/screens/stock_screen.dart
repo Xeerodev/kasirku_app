@@ -10,14 +10,6 @@ class StockScreen extends StatefulWidget {
   const StockScreen({super.key});
 
   @override
-  State<StockScreen> createState() => _StockScreenState();
-}
-
-class _StockScreenState extends State<StockScreen> {
-  String _searchQuery = '';
-  final _formKey = GlobalKey<FormState>();
-
-  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
     final currencyFormatter = NumberFormat.currency(
@@ -287,7 +279,7 @@ class _StockScreenState extends State<StockScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(productToEdit == null ? provider.tr('add_product') : provider.tr('edit_product'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
+                        Expanded(child: Text(productToEdit == null ? provider.tr('add_product') : provider.tr('edit_product'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1)), overflow: TextOverflow.ellipsis)),
                         IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: provider.isDarkMode ? Colors.white54 : Colors.black54)),
                       ],
                     ),
@@ -331,9 +323,11 @@ class _StockScreenState extends State<StockScreen> {
                       ),
 
                     const SizedBox(height: 16),
-                    Row(
+                    Flex(
+                      direction: width > 400 ? Axis.horizontal : Axis.vertical,
                       children: [
                         Expanded(
+                          flex: width > 400 ? 1 : 0,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -348,8 +342,9 @@ class _StockScreenState extends State<StockScreen> {
                             ]
                           )
                         ),
-                        const SizedBox(width: 12),
+                        if (width > 400) const SizedBox(width: 12) else const SizedBox(height: 16),
                         Expanded(
+                          flex: width > 400 ? 1 : 0,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

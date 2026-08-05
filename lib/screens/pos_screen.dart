@@ -163,7 +163,7 @@ class _PosScreenState extends State<PosScreen> {
                     padding: const EdgeInsets.all(16),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
-                      childAspectRatio: 0.68,
+                      childAspectRatio: width > 600 ? 0.75 : 0.65, // More dynamic ratio
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
@@ -259,7 +259,10 @@ class _PosScreenState extends State<PosScreen> {
                   if (!isOutOfStock)
                     Text('${provider.language == 'Indonesia' ? 'Stok' : 'Stock'}: ${product.stock}', style: const TextStyle(color: Color(0xFF006C49), fontWeight: FontWeight.bold, fontSize: 10)),
                   const Spacer(),
-                  Text(formatter.format(product.price), style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 14)),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(formatter.format(product.price), style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 14)),
+                  ),
                   const SizedBox(height: 8),
                   // Controls
                   Row(

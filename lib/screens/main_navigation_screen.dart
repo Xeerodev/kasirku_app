@@ -66,7 +66,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: [
           // Header Sidebar
           Container(
-            height: 70,
+            height: 80,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               border: Border(
@@ -98,17 +98,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     children: [
                       Text(
                         provider.storeProfile.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0D47A1),
+                          color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const Text(
+                      Text(
                         'Developed by Xeerodev',
-                        style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 8, color: provider.isDarkMode ? Colors.white38 : Colors.grey, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -141,7 +143,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         children: [
                           Icon(
                             item['icon'],
-                            size: 22,
+                            size: 20,
                             color: isActive ? Colors.white : (provider.isDarkMode ? Colors.white70 : const Color(0xFF45464D)),
                           ),
                           const SizedBox(width: 12),
@@ -149,15 +151,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             child: Text(
                               provider.tr(item['label']),
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
                                 color: isActive ? Colors.white : (provider.isDarkMode ? Colors.white70 : const Color(0xFF45464D)),
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (item['id'] == 'pos' && provider.cartTotalItems > 0)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: isActive ? Colors.white : const Color(0xFF0D47A1),
                                 borderRadius: BorderRadius.circular(10),
@@ -165,7 +168,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               child: Text(
                                 '${provider.cartTotalItems}',
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 9,
                                   fontWeight: FontWeight.bold,
                                   color: isActive ? const Color(0xFF0D47A1) : Colors.white,
                                 ),
@@ -192,6 +195,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               ),
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Theme Toggle
                 InkWell(
@@ -199,7 +203,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
-                      color: provider.isDarkMode ? const Color(0xFF12253C) : const Color(0xFFE3F2FD),
+                      color: provider.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFFE3F2FD),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.blue.withOpacity(0.1)),
                     ),
@@ -210,25 +214,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           children: [
                             Icon(
                               provider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                              size: 18,
+                              size: 16,
                               color: const Color(0xFF0D47A1),
                             ),
                             const SizedBox(width: 8),
                             Text(
                               provider.isDarkMode ? (provider.language == 'Indonesia' ? 'Gelap' : 'Dark') : (provider.language == 'Indonesia' ? 'Terang' : 'Light'),
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1)),
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1)),
                             ),
                           ],
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           decoration: BoxDecoration(
                             color: provider.isDarkMode ? Colors.black26 : Colors.white,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             provider.isDarkMode ? 'DARK' : 'LIGHT',
-                            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1)),
+                            style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1)),
                           ),
                         ),
                       ],
@@ -240,18 +244,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: provider.isDarkMode ? const Color(0xFF12253C) : const Color(0xFFE3F2FD),
+                    color: provider.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFFE3F2FD),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.blue.withOpacity(0.1)),
                   ),
                   child: Row(
                     children: [
                       CircleAvatar(
-                        radius: 14,
+                        radius: 12,
                         backgroundColor: const Color(0xFF0D47A1),
                         child: Text(
                           provider.storeProfile.cashierName.isNotEmpty ? provider.storeProfile.cashierName[0].toUpperCase() : 'K',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -262,14 +266,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             Text(
                               provider.storeProfile.cashierName,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: provider.isDarkMode ? Colors.white : const Color(0xFF0B1C30),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            Text(provider.language == 'Indonesia' ? 'Kasir Aktif' : 'Active Cashier', style: const TextStyle(fontSize: 9, color: Colors.grey)),
+                            Text(provider.language == 'Indonesia' ? 'Kasir Aktif' : 'Active Cashier', style: const TextStyle(fontSize: 8, color: Colors.grey)),
                           ],
                         ),
                       ),
@@ -326,7 +330,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         ),
                         child: Icon(
                           item['icon'],
-                          size: 22,
+                          size: 20,
                           color: isActive ? Colors.white : Colors.grey,
                         ),
                       ),
@@ -339,7 +343,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             decoration: const BoxDecoration(color: Color(0xFFBA1A1A), shape: BoxShape.circle),
                             child: Text(
                               '${provider.cartTotalItems}',
-                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -349,7 +353,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   Text(
                     provider.tr(item['label']),
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                       color: isActive ? const Color(0xFF0D47A1) : Colors.grey,
                     ),
