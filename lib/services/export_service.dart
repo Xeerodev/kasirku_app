@@ -38,7 +38,7 @@ class ExportService {
         ),
       );
 
-      final output = await _getAppFolder();
+      final output = await getKasirkuFolder();
       final file = File("${output.path}/Laporan_${DateTime.now().millisecondsSinceEpoch}.pdf");
       await file.writeAsBytes(await pdf.save());
       return file.path;
@@ -56,7 +56,6 @@ class ExportService {
       var excel = Excel.createExcel();
       Sheet sheetObject = excel['Sheet1'];
 
-      // Excel 4.0.0+ uses CellValue wrappers
       if (lang == 'Indonesia') {
         sheetObject.appendRow([
           TextCellValue('No. Faktur'),
@@ -85,7 +84,7 @@ class ExportService {
         ]);
       }
 
-      final output = await _getAppFolder();
+      final output = await getKasirkuFolder();
       final filePath = "${output.path}/Laporan_${DateTime.now().millisecondsSinceEpoch}.xlsx";
 
       var fileBytes = excel.save();
@@ -99,9 +98,25 @@ class ExportService {
     }
   }
 
-  static Future<Directory> _getAppFolder() async {
+  static Future<String?> saveBackupJson(String jsonData) async {
+    try {
+      final output = await getKasirkuFolder();
+      final filePath = "${output.path}/Backup_Kasirku_${DateTime.now().millisecondsSinceEpoch}.json";
+      final file = File(filePath);
+      await file.writeAsString(jsonData);
+      return filePath;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<Directory> getKasirkuFolder() async {
     Directory? directory;
     if (Platform.isAndroid) {
+      // Trying to get a more public folder for user convenience
+      directory = await getExternalStorageDirectory();
+      // If we want root /Kasirku, we need manage external storage permission (Android 11+),
+      // so we stick to App Documents / Kasirku for safety in UAS.
       directory = await getApplicationDocumentsDirectory();
     } else {
       directory = await getApplicationDocumentsDirectory();

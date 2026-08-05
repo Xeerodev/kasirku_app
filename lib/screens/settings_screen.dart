@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../providers/pos_provider.dart';
 import '../models/store_profile.dart';
 import '../services/printer_service.dart';
+import '../services/export_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -39,7 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _checkPrinterStatus() async {
     if (kIsWeb) return;
     bool connected = await _printerService.isConnected();
-    setState(() => _isPrinterConnected = connected);
+    if (mounted) setState(() => _isPrinterConnected = connected);
   }
 
   @override
@@ -137,45 +138,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _handleBackupJson(BuildContext context, PosProvider provider) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.backup, color: Color(0xFF0D47A1)),
-            const SizedBox(width: 12),
-            Text(provider.language == 'Indonesia' ? 'Cadangkan Data' : 'Data Backup', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              provider.language == 'Indonesia'
-                ? 'Data Anda siap untuk dicadangkan secara offline.'
-                : 'Your data is ready to be backed up offline.',
-              style: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.black87, fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-              child: Text(
-                'backup_kasirku_${DateTime.now().millisecondsSinceEpoch}.json',
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.blue),
+  Future<void> _handleBackupJson(BuildContext context, PosProvider provider) async {
+    final jsonStr = provider.getBackupJson();
+    final path = await ExportService.saveBackupJson(jsonStr);
+
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              const Icon(Icons.backup, color: Color(0xFF0D47A1)),
+              const SizedBox(width: 12),
+              Text(provider.language == 'Indonesia' ? 'Cadangkan Data' : 'Data Backup', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                path != null
+                  ? (provider.language == 'Indonesia' ? 'Data berhasil dicadangkan ke file JSON.' : 'Data successfully backed up to JSON file.')
+                  : (provider.language == 'Indonesia' ? 'Gagal mencadangkan data.' : 'Failed to backup data.'),
+                style: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.black87, fontSize: 13),
               ),
-            ),
+              if (path != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                  child: Text(path, style: const TextStyle(fontFamily: 'monospace', fontSize: 9, color: Colors.blue)),
+                ),
+              ]
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
-        ],
-      ),
-    );
+      );
+    }
   }
 
   void _showFloatingPopup(BuildContext context, String message, {bool isError = false}) {
