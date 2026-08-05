@@ -30,7 +30,7 @@ class TransactionModel {
   final String id;
   final String invoiceNumber;
   final DateTime date;
-  final String timeString; // Matching React's timeString
+  final String timeString;
   final List<CartItem> items;
   final double subtotal;
   final double tax;
@@ -40,7 +40,7 @@ class TransactionModel {
   final double changeAmount;
   final String paymentMethod;
   final String cashierName;
-  final String status; // 'Lunas' or 'Refund'
+  final String status;
 
   TransactionModel({
     required this.id,
