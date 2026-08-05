@@ -455,8 +455,8 @@ class _PosScreenState extends State<PosScreen> {
   void _showPaymentFlow(BuildContext context, PosProvider provider) {
     final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     String paymentMethod = 'Tunai';
-    double cashAmount = provider.cartTotal;
-    final cashController = TextEditingController(text: cashAmount.toInt().toString());
+    double cashAmount = 0;
+    final cashController = TextEditingController(text: '');
     String? proofPhotoBase64;
 
     showDialog(
@@ -753,11 +753,11 @@ class _PosScreenState extends State<PosScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(child: Text('${item.quantity}x ${item.product.name}', style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold))),
+                                      Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold))),
                                       Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
-                                  Text('   @ ${currencyFormatter.format(item.product.price)}', style: GoogleFonts.sourceCodePro(fontSize: 8, color: Colors.black54)),
+                                  Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
                                 ],
                               ),
                             )),
