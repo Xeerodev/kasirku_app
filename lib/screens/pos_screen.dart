@@ -46,6 +46,9 @@ class _PosScreenState extends State<PosScreen> {
       return matchesCategory && matchesSearch;
     }).toList();
 
+    final width = MediaQuery.of(context).size.width;
+    final crossAxisCount = width > 1200 ? 5 : (width > 900 ? 4 : (width > 600 ? 3 : 2));
+
     return Scaffold(
       backgroundColor: provider.isDarkMode ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
       body: Column(
@@ -161,8 +164,8 @@ class _PosScreenState extends State<PosScreen> {
                 ? _buildEmptyState()
                 : GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
                       childAspectRatio: 0.68,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
@@ -222,9 +225,15 @@ class _PosScreenState extends State<PosScreen> {
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                    image: product.image.isNotEmpty ? DecorationImage(image: NetworkImage(product.image), fit: BoxFit.cover) : null,
                   ),
-                  child: product.image.isEmpty ? const Icon(Icons.local_cafe, size: 40, color: Colors.grey) : null,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                    child: product.image.isNotEmpty
+                        ? (product.image.startsWith('http')
+                            ? Image.network(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
+                            : Image.memory(base64Decode(product.image), fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null))
+                        : const Icon(Icons.local_cafe, size: 40, color: Colors.grey),
+                  ),
                 ),
                 if (isOutOfStock)
                   Container(
@@ -300,6 +309,7 @@ class _PosScreenState extends State<PosScreen> {
   Widget _buildFloatingCartBar(PosProvider provider, NumberFormat formatter) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
+      constraints: const BoxConstraints(maxWidth: 500),
       height: 56,
       decoration: BoxDecoration(
         color: const Color(0xFF0D47A1),
@@ -383,9 +393,15 @@ class _PosScreenState extends State<PosScreen> {
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(8),
-                        image: item.product.image.isNotEmpty ? DecorationImage(image: NetworkImage(item.product.image), fit: BoxFit.cover) : null,
                       ),
-                      child: item.product.image.isEmpty ? const Icon(Icons.image, color: Colors.grey) : null,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: item.product.image.isNotEmpty
+                            ? (item.product.image.startsWith('http')
+                                ? Image.network(item.product.image, fit: BoxFit.cover)
+                                : Image.memory(base64Decode(item.product.image), fit: BoxFit.cover))
+                            : const Icon(Icons.image, color: Colors.grey),
+                      ),
                     ),
                     title: Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     subtitle: Text(formatter.format(item.product.price), style: const TextStyle(fontSize: 12)),
@@ -462,7 +478,7 @@ class _PosScreenState extends State<PosScreen> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: Container(
               width: double.infinity,
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 450),
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 500),
               padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -592,7 +608,13 @@ class _PosScreenState extends State<PosScreen> {
                                      ElevatedButton.icon(
                                        onPressed: () async {
                                          final picker = ImagePicker();
-                                         final photo = await picker.pickImage(source: ImageSource.camera);
+                                         // Optimized Image Picking
+                                         final photo = await picker.pickImage(
+                                           source: ImageSource.camera,
+                                           maxWidth: 600,
+                                           maxHeight: 600,
+                                           imageQuality: 60,
+                                         );
                                          if (photo != null) {
                                            final bytes = await photo.readAsBytes();
                                            setDialogState(() => proofPhotoBase64 = base64Encode(bytes));
