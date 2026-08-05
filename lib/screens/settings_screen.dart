@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:image_picker/image_picker.dart';
 import '../providers/pos_provider.dart';
 import '../models/store_profile.dart';
 
@@ -61,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Icon(Icons.settings, color: isDark ? Colors.lightBlueAccent : const Color(0xFF003178)),
             const SizedBox(width: 12),
-            Text('Pengaturan', style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF003178), fontWeight: FontWeight.bold)),
+            Text(provider.tr('settings'), style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF003178), fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -82,7 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             // Section 1: Profil Toko
             _buildSection(
-              title: 'Profil Toko & Kasir',
+              title: provider.tr('store_profile'),
               icon: Icons.store,
               isDark: isDark,
               child: Column(
@@ -108,8 +109,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: provider.storeProfile.logoUrl.isEmpty ? Icon(Icons.storefront, size: 40, color: isDark ? Colors.white24 : Colors.grey) : null,
                           ),
                           TextButton(
-                            onPressed: () => _showLogoUrlPrompt(context, provider),
-                            child: Text('Ubah Logo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
+                            onPressed: () => _handleLogoPick(context, provider),
+                            child: Text(provider.language == 'Indonesia' ? 'Ubah Logo' : 'Change Logo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
                           ),
                         ],
                       ),
@@ -117,18 +118,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Expanded(
                         child: Column(
                           children: [
-                            _buildTextField(controller: _nameController, label: 'Nama Toko', isDark: isDark),
+                            _buildTextField(controller: _nameController, label: provider.language == 'Indonesia' ? 'Nama Toko' : 'Store Name', isDark: isDark),
                             const SizedBox(height: 12),
-                            _buildTextField(controller: _cashierController, label: 'Nama Kasir', isDark: isDark),
+                            _buildTextField(controller: _cashierController, label: provider.language == 'Indonesia' ? 'Nama Kasir' : 'Cashier Name', isDark: isDark),
                           ],
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _addressController, label: 'Alamat', maxLines: 2, isDark: isDark),
+                  _buildTextField(controller: _addressController, label: provider.language == 'Indonesia' ? 'Alamat' : 'Address', maxLines: 2, isDark: isDark),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _phoneController, label: 'Nomor Telepon', isDark: isDark),
+                  _buildTextField(controller: _phoneController, label: provider.language == 'Indonesia' ? 'Nomor Telepon' : 'Phone Number', isDark: isDark),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -140,10 +141,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         logoUrl: provider.storeProfile.logoUrl,
                         isConfigured: true,
                       ));
-                      _showFloatingPopup(context, 'Profil berhasil disimpan', isError: false);
+                      _showFloatingPopup(context, provider.language == 'Indonesia' ? 'Profil berhasil disimpan' : 'Profile saved successfully', isError: false);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061A4), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: const Text('Simpan Profil & Kasir', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(provider.language == 'Indonesia' ? 'Simpan Profil & Kasir' : 'Save Profile & Cashier', style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -153,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             // Section 2: Printer
             _buildSection(
-              title: 'Printer & Struk',
+              title: provider.tr('printer_receipt'),
               icon: Icons.print,
               isDark: isDark,
               child: Column(
@@ -163,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: provider.activePrinter,
                     style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                     decoration: InputDecoration(
-                      labelText: 'Printer Aktif',
+                      labelText: provider.language == 'Indonesia' ? 'Printer Aktif' : 'Active Printer',
                       labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
                       border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
                       enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
@@ -173,18 +174,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildSwitchRow(
-                    label: 'Cetak struk otomatis',
+                    label: provider.language == 'Indonesia' ? 'Cetak struk otomatis' : 'Auto print receipt',
                     value: provider.autoPrintReceipt,
                     onChanged: (val) => provider.updatePrinterSettings(autoPrint: val),
                     isDark: isDark,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField(controller: _footerController, label: 'Pesan Footer Struk', maxLines: 3, isDark: isDark),
+                  _buildTextField(controller: _footerController, label: provider.language == 'Indonesia' ? 'Pesan Footer Struk' : 'Receipt Footer Message', maxLines: 3, isDark: isDark),
                   const SizedBox(height: 16),
                   OutlinedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.receipt, size: 18),
-                    label: const Text('Test Print Struk'),
+                    label: Text(provider.language == 'Indonesia' ? 'Test Print Struk' : 'Test Print Receipt'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
                       side: BorderSide(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0061A4)),
@@ -200,13 +201,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             // Section 3: Sistem
             _buildSection(
-              title: 'Sistem & Masukan',
+              title: provider.language == 'Indonesia' ? 'Sistem & Masukan' : 'System & Feedback',
               icon: Icons.settings_system_daydream,
               isDark: isDark,
               child: Column(
                 children: [
                   _buildDropdownRow(
-                    label: 'Bahasa',
+                    label: provider.tr('language'),
                     icon: Icons.language,
                     value: provider.language,
                     items: ['Indonesia', 'English'],
@@ -214,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildSwitchRow(
-                    label: 'Tema Gelap',
+                    label: provider.tr('theme'),
                     icon: Icons.dark_mode,
                     value: provider.isDarkMode,
                     onChanged: (val) => provider.updateSystemSettings(dark: val),
@@ -224,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ElevatedButton.icon(
                     onPressed: () => _showChangePasswordDialog(context, provider),
                     icon: const Icon(Icons.lock_reset),
-                    label: const Text('Ubah Kata Sandi Kasir'),
+                    label: Text(provider.tr('change_password')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0D47A1),
                       foregroundColor: Colors.white,
@@ -236,14 +237,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ElevatedButton.icon(
                     onPressed: _handleContactDev,
                     icon: const Icon(Icons.chat),
-                    label: const Text('Hubungi Developer (WhatsApp)'),
+                    label: Text(provider.language == 'Indonesia' ? 'Hubungi Developer (WhatsApp)' : 'Contact Developer (WhatsApp)'),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.backup),
-                    label: const Text('Cadangkan Data JSON'),
+                    label: Text(provider.language == 'Indonesia' ? 'Cadangkan Data JSON' : 'Backup JSON Data'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
                       side: BorderSide(color: isDark ? Colors.white24 : Colors.grey),
@@ -270,14 +271,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Container(width: 56, height: 56, decoration: const BoxDecoration(color: Color(0xFFFFDAD6), shape: BoxShape.circle), child: const Icon(Icons.logout, color: Color(0xFF93000A), size: 30)),
                   const SizedBox(height: 12),
-                  Text('Keluar dari Sesi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
+                  Text(provider.tr('logout'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
                   const SizedBox(height: 4),
-                  Text('Pastikan semua transaksi telah selesai sebelum keluar dari aplikasi.', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.grey)),
+                  Text(
+                    provider.language == 'Indonesia'
+                      ? 'Pastikan semua transaksi telah selesai sebelum keluar dari aplikasi.'
+                      : 'Ensure all transactions are completed before logging out.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.grey)
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () => provider.logout(),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: const Text('Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(provider.language == 'Indonesia' ? 'Keluar' : 'Logout', style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -378,6 +385,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _handleLogoPick(BuildContext context, PosProvider provider) async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(source: ImageSource.gallery, maxWidth: 400, imageQuality: 70);
+    if (photo != null) {
+      final bytes = await photo.readAsBytes();
+      final base64 = base64Encode(bytes);
+      provider.updateStoreProfile(provider.storeProfile.copyWith(logoUrl: base64));
+      if (mounted) _showFloatingPopup(context, provider.language == 'Indonesia' ? 'Logo berhasil diperbarui' : 'Logo updated successfully', isError: false);
+    }
+  }
+
   void _showLogoUrlPrompt(BuildContext context, PosProvider provider) {
     final controller = TextEditingController(text: provider.storeProfile.logoUrl);
     final isDark = provider.isDarkMode;
@@ -413,26 +431,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final oldPassCtrl = TextEditingController();
     final newPassCtrl = TextEditingController();
     final isDark = provider.isDarkMode;
+    final lang = provider.language;
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Ubah Kata Sandi Kasir', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+        title: Text(provider.tr('change_password'), style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Konfirmasi kata sandi lama sebelum menggantinya.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
+            Text(lang == 'Indonesia' ? 'Konfirmasi kata sandi lama sebelum menggantinya.' : 'Confirm old password before changing.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
             const SizedBox(height: 16),
             TextField(
               controller: oldPassCtrl,
               obscureText: true,
               style: TextStyle(color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
-                labelText: 'Kata Sandi Saat Ini',
+                labelText: lang == 'Indonesia' ? 'Kata Sandi Saat Ini' : 'Current Password',
                 border: const OutlineInputBorder(),
                 labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
               ),
             ),
             const SizedBox(height: 12),
@@ -441,33 +461,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
               obscureText: true,
               style: TextStyle(color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
-                labelText: 'Kata Sandi Baru',
-                hintText: 'Minimal 6 karakter',
+                labelText: lang == 'Indonesia' ? 'Kata Sandi Baru' : 'New Password',
+                hintText: lang == 'Indonesia' ? 'Minimal 6 karakter' : 'Min 6 characters',
                 border: const OutlineInputBorder(),
                 labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(lang == 'Indonesia' ? 'Batal' : 'Cancel')),
           ElevatedButton(
             onPressed: () {
               if (oldPassCtrl.text != provider.adminPassword) {
-                _showFloatingPopup(context, 'Kata sandi lama salah!', isError: true);
+                _showFloatingPopup(context, lang == 'Indonesia' ? 'Kata sandi lama salah!' : 'Wrong current password!', isError: true);
                 return;
               }
               if (newPassCtrl.text.length < 4) {
-                _showFloatingPopup(context, 'Password baru terlalu pendek!', isError: true);
+                _showFloatingPopup(context, lang == 'Indonesia' ? 'Password baru terlalu pendek!' : 'New password is too short!', isError: true);
                 return;
               }
               provider.updatePassword(newPassCtrl.text);
               Navigator.pop(ctx);
-              _showFloatingPopup(context, 'Kata sandi berhasil diubah', isError: false);
+              _showFloatingPopup(context, lang == 'Indonesia' ? 'Kata sandi berhasil diubah' : 'Password changed successfully', isError: false);
             },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white),
-            child: const Text('Simpan'),
+            child: Text(lang == 'Indonesia' ? 'Simpan' : 'Save'),
           ),
         ],
       ),

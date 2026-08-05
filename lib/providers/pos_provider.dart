@@ -107,6 +107,54 @@ class PosProvider with ChangeNotifier {
     return categories;
   }
 
+  // Translation Map
+  final Map<String, Map<String, String>> _translations = {
+    'Indonesia': {
+      'cashier': 'Kasir',
+      'stock': 'Stok',
+      'history': 'Riwayat',
+      'reports': 'Laporan',
+      'settings': 'Pengaturan',
+      'search_product': 'Cari produk...',
+      'empty_cart': 'Keranjang Kosong',
+      'process_payment': 'PROSES PEMBAYARAN',
+      'total_bill': 'Total Tagihan',
+      'payment_method': 'Metode Pembayaran',
+      'cash': 'Tunai',
+      'card': 'Kartu',
+      'change_password': 'Ubah Kata Sandi Kasir',
+      'logout': 'Keluar dari Sesi',
+      'language': 'Bahasa',
+      'theme': 'Tema Gelap',
+      'store_profile': 'Profil Toko & Kasir',
+      'printer_receipt': 'Printer & Struk',
+    },
+    'English': {
+      'cashier': 'POS',
+      'stock': 'Inventory',
+      'history': 'History',
+      'reports': 'Analytics',
+      'settings': 'Settings',
+      'search_product': 'Search product...',
+      'empty_cart': 'Cart is Empty',
+      'process_payment': 'PROCESS PAYMENT',
+      'total_bill': 'Total Bill',
+      'payment_method': 'Payment Method',
+      'cash': 'Cash',
+      'card': 'Card',
+      'change_password': 'Change Cashier Password',
+      'logout': 'Logout Session',
+      'language': 'Language',
+      'theme': 'Dark Theme',
+      'store_profile': 'Store Profile & Cashier',
+      'printer_receipt': 'Printer & Receipt',
+    }
+  };
+
+  String tr(String key) {
+    return _translations[_language]?[key] ?? key;
+  }
+
   double get cartSubtotal =>
       _cart.fold(0, (sum, item) => sum + item.subtotal);
 

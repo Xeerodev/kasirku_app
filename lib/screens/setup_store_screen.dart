@@ -18,6 +18,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   String _logoBase64 = '';
+  final String _defaultLogoUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg';
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                               border: Border.all(color: Colors.blue.withOpacity(0.2)),
                             ),
                             child: Image.network(
-                              'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
+                              _defaultLogoUrl,
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -205,7 +206,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                               address: _addressController.text,
                               phone: _phoneController.text,
                               cashierName: 'Kasir Utama',
-                              logoUrl: _logoBase64,
+                              logoUrl: _logoBase64.isEmpty ? _defaultLogoUrl : _logoBase64,
                               isConfigured: true,
                             ));
                             provider.login();
