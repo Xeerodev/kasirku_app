@@ -48,6 +48,150 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _handleLogoPick(BuildContext context, PosProvider provider) async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(source: ImageSource.gallery, maxWidth: 400, imageQuality: 70);
+    if (photo != null) {
+      final bytes = await photo.readAsBytes();
+      final base64 = base64Encode(bytes);
+      provider.updateStoreProfile(provider.storeProfile.copyWith(logoUrl: base64));
+      if (mounted) _showFloatingPopup(context, provider.language == 'Indonesia' ? 'Logo berhasil diperbarui' : 'Logo updated successfully', isError: false);
+    }
+  }
+
+  void _showChangePasswordDialog(BuildContext context, PosProvider provider) {
+    final oldPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final isDark = provider.isDarkMode;
+    final lang = provider.language;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(provider.tr('change_password'), style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(lang == 'Indonesia' ? 'Konfirmasi kata sandi lama sebelum menggantinya.' : 'Confirm old password before changing.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: oldPassCtrl,
+              obscureText: true,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                labelText: lang == 'Indonesia' ? 'Kata Sandi Saat Ini' : 'Current Password',
+                border: const OutlineInputBorder(),
+                labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: newPassCtrl,
+              obscureText: true,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                labelText: lang == 'Indonesia' ? 'Kata Sandi Baru' : 'New Password',
+                hintText: lang == 'Indonesia' ? 'Minimal 6 karakter' : 'Min 6 characters',
+                border: const OutlineInputBorder(),
+                labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(lang == 'Indonesia' ? 'Batal' : 'Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              if (oldPassCtrl.text != provider.adminPassword) {
+                _showFloatingPopup(context, lang == 'Indonesia' ? 'Kata sandi lama salah!' : 'Wrong current password!', isError: true);
+                return;
+              }
+              if (newPassCtrl.text.length < 4) {
+                _showFloatingPopup(context, lang == 'Indonesia' ? 'Password baru terlalu pendek!' : 'New password is too short!', isError: true);
+                return;
+              }
+              provider.updatePassword(newPassCtrl.text);
+              Navigator.pop(ctx);
+              _showFloatingPopup(context, lang == 'Indonesia' ? 'Kata sandi berhasil diubah' : 'Password changed successfully', isError: false);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white),
+            child: Text(lang == 'Indonesia' ? 'Simpan' : 'Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleBackupJson(BuildContext context, PosProvider provider) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.backup, color: Color(0xFF0D47A1)),
+            const SizedBox(width: 12),
+            Text(provider.language == 'Indonesia' ? 'Cadangkan Data' : 'Data Backup', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              provider.language == 'Indonesia'
+                ? 'Data Anda siap untuk dicadangkan secara offline.'
+                : 'Your data is ready to be backed up offline.',
+              style: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.black87, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                'backup_kasirku_${DateTime.now().millisecondsSinceEpoch}.json',
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.blue),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+        ],
+      ),
+    );
+  }
+
+  void _showFloatingPopup(BuildContext context, String message, {bool isError = false}) {
+    final isDark = Provider.of<PosProvider>(context, listen: false).isDarkMode;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(isError ? Icons.error_outline : Icons.check_circle_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white))),
+          ],
+        ),
+        backgroundColor: isError ? const Color(0xFFBA1A1A) : const Color(0xFF006C49),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 140,
+          left: 20,
+          right: 20,
+        ),
+        duration: const Duration(seconds: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        elevation: 10,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
@@ -381,182 +525,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: onChanged,
           ),
         ],
-      ),
-    );
-  }
-
-  Future<void> _handleLogoPick(BuildContext context, PosProvider provider) async {
-    final picker = ImagePicker();
-    final photo = await picker.pickImage(source: ImageSource.gallery, maxWidth: 400, imageQuality: 70);
-    if (photo != null) {
-      final bytes = await photo.readAsBytes();
-      final base64 = base64Encode(bytes);
-      provider.updateStoreProfile(provider.storeProfile.copyWith(logoUrl: base64));
-      if (mounted) _showFloatingPopup(context, provider.language == 'Indonesia' ? 'Logo berhasil diperbarui' : 'Logo updated successfully', isError: false);
-    }
-  }
-
-  void _showLogoUrlPrompt(BuildContext context, PosProvider provider) {
-    final controller = TextEditingController(text: provider.storeProfile.logoUrl);
-    final isDark = provider.isDarkMode;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
-        title: Text('URL Logo Baru', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-        content: TextField(
-          controller: controller,
-          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-          decoration: InputDecoration(
-            hintText: 'https://...',
-            hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
-          )
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
-          ElevatedButton(
-            onPressed: () {
-              provider.updateStoreProfile(provider.storeProfile.copyWith(logoUrl: controller.text));
-              Navigator.pop(ctx);
-              _showFloatingPopup(context, 'Logo berhasil diperbarui', isError: false);
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showChangePasswordDialog(BuildContext context, PosProvider provider) {
-    final oldPassCtrl = TextEditingController();
-    final newPassCtrl = TextEditingController();
-    final isDark = provider.isDarkMode;
-    final lang = provider.language;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(provider.tr('change_password'), style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(lang == 'Indonesia' ? 'Konfirmasi kata sandi lama sebelum menggantinya.' : 'Confirm old password before changing.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
-            const SizedBox(height: 16),
-            TextField(
-              controller: oldPassCtrl,
-              obscureText: true,
-              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-              decoration: InputDecoration(
-                labelText: lang == 'Indonesia' ? 'Kata Sandi Saat Ini' : 'Current Password',
-                border: const OutlineInputBorder(),
-                labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: newPassCtrl,
-              obscureText: true,
-              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-              decoration: InputDecoration(
-                labelText: lang == 'Indonesia' ? 'Kata Sandi Baru' : 'New Password',
-                hintText: lang == 'Indonesia' ? 'Minimal 6 karakter' : 'Min 6 characters',
-                border: const OutlineInputBorder(),
-                labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(lang == 'Indonesia' ? 'Batal' : 'Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              if (oldPassCtrl.text != provider.adminPassword) {
-                _showFloatingPopup(context, lang == 'Indonesia' ? 'Kata sandi lama salah!' : 'Wrong current password!', isError: true);
-                return;
-              }
-              if (newPassCtrl.text.length < 4) {
-                _showFloatingPopup(context, lang == 'Indonesia' ? 'Password baru terlalu pendek!' : 'New password is too short!', isError: true);
-                return;
-              }
-              provider.updatePassword(newPassCtrl.text);
-              Navigator.pop(ctx);
-              _showFloatingPopup(context, lang == 'Indonesia' ? 'Kata sandi berhasil diubah' : 'Password changed successfully', isError: false);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white),
-            child: Text(lang == 'Indonesia' ? 'Simpan' : 'Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleBackupJson(BuildContext context, PosProvider provider) {
-    final jsonStr = provider.getBackupJson();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.backup, color: Color(0xFF0D47A1)),
-            const SizedBox(width: 12),
-            Text(provider.language == 'Indonesia' ? 'Cadangkan Data' : 'Data Backup', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              provider.language == 'Indonesia'
-                ? 'Data Anda siap untuk dicadangkan secara offline.'
-                : 'Your data is ready to be backed up offline.',
-              style: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.black87, fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-              child: Text(
-                'backup_kasirku_${DateTime.now().millisecondsSinceEpoch}.json',
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.blue),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
-        ],
-      ),
-    );
-  }
-
-  void _showFloatingPopup(BuildContext context, String message, {bool isError = false}) {
-    final isDark = Provider.of<PosProvider>(context, listen: false).isDarkMode;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(isError ? Icons.error_outline : Icons.check_circle_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white))),
-          ],
-        ),
-        backgroundColor: isError ? const Color(0xFFBA1A1A) : const Color(0xFF006C49),
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).size.height - 140,
-          left: 20,
-          right: 20,
-        ),
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 10,
       ),
     );
   }

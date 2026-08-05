@@ -10,11 +10,20 @@ class StockScreen extends StatefulWidget {
   const StockScreen({super.key});
 
   @override
+  State<StockScreen> createState() => _StockScreenState();
+}
+
+class _StockScreenState extends State<StockScreen> {
+  String _searchQuery = '';
+  final _formKey = GlobalKey<FormState>();
+
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
+    final isDark = provider.isDarkMode;
     final currencyFormatter = NumberFormat.currency(
-      locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
-      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
+      locale: 'id_ID',
+      symbol: 'Rp ',
       decimalDigits: 0,
     );
 
@@ -27,10 +36,9 @@ class StockScreen extends StatefulWidget {
     final crossAxisCount = width > 1200 ? 3 : (width > 800 ? 2 : 1);
 
     return Scaffold(
-      backgroundColor: provider.isDarkMode ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
+      backgroundColor: isDark ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
       body: Column(
         children: [
-          // Header Section (Matching React StockView)
           Container(
             padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
             child: Column(
@@ -39,34 +47,33 @@ class StockScreen extends StatefulWidget {
                 Text(
                   provider.tr('stock'),
                   style: TextStyle(
-                    color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
+                    color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
                     fontWeight: FontWeight.bold,
                     fontSize: 28,
                   ),
                 ),
                 Text(
                   provider.language == 'Indonesia' ? 'Kelola ketersediaan produk dan harga barang' : 'Manage product availability and item prices',
-                  style: TextStyle(color: provider.isDarkMode ? Colors.white54 : const Color(0xFF45464D), fontSize: 12),
+                  style: TextStyle(color: isDark ? Colors.white54 : const Color(0xFF45464D), fontSize: 12),
                 ),
                 const SizedBox(height: 20),
-                // Search Bar
                 Container(
                   height: 52,
                   decoration: BoxDecoration(
-                    color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+                    color: isDark ? const Color(0xFF12253C) : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05)),
+                    border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
                     boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 2))],
                   ),
                   child: TextField(
                     onChanged: (val) => setState(() => _searchQuery = val),
-                    style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                     decoration: InputDecoration(
                       hintText: provider.tr('search_product'),
-                      hintStyle: TextStyle(color: provider.isDarkMode ? Colors.white38 : Colors.grey, fontSize: 14),
-                      prefixIcon: Icon(Icons.search, color: provider.isDarkMode ? Colors.white38 : const Color(0xFF76777D)),
+                      hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 14),
+                      prefixIcon: Icon(Icons.search, color: isDark ? Colors.white38 : const Color(0xFF76777D)),
                       suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(icon: Icon(Icons.close, size: 18, color: provider.isDarkMode ? Colors.white38 : Colors.grey), onPressed: () => setState(() => _searchQuery = ''))
+                          ? IconButton(icon: Icon(Icons.close, size: 18, color: isDark ? Colors.white38 : Colors.grey), onPressed: () => setState(() => _searchQuery = ''))
                           : null,
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -76,8 +83,6 @@ class StockScreen extends StatefulWidget {
               ],
             ),
           ),
-
-          // List Area (Grid for desktop/tablet)
           Expanded(
             child: filteredProducts.isEmpty
                 ? _buildEmptyState(provider)
@@ -163,7 +168,6 @@ class StockScreen extends StatefulWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Thumbnail
           Container(
             width: 80,
             height: 80,
@@ -182,7 +186,6 @@ class StockScreen extends StatefulWidget {
             ),
           ),
           const SizedBox(width: 16),
-          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +203,6 @@ class StockScreen extends StatefulWidget {
               ],
             ),
           ),
-          // Actions
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.blue.withOpacity(0.1))),
@@ -258,6 +260,7 @@ class StockScreen extends StatefulWidget {
     bool isCustom = !provider.existingCategories.contains(selectedCat);
     String imageBase64 = productToEdit?.image ?? '';
     final lang = provider.language;
+    final width = MediaQuery.of(context).size.width;
 
     showDialog(
       context: context,
@@ -285,7 +288,6 @@ class StockScreen extends StatefulWidget {
                     ),
                     const Divider(),
                     const SizedBox(height: 16),
-
                     _buildLabel(provider.tr('product_name'), provider.isDarkMode),
                     TextFormField(
                       controller: nameCtrl,
@@ -294,7 +296,6 @@ class StockScreen extends StatefulWidget {
                       validator: (v) => v!.isEmpty ? (lang == 'Indonesia' ? 'Nama produk wajib diisi' : 'Product name is required') : null,
                     ),
                     const SizedBox(height: 16),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -321,7 +322,6 @@ class StockScreen extends StatefulWidget {
                         decoration: _inputDeco(lang == 'Indonesia' ? 'Tulis nama kategori baru...' : 'Type new category name...'),
                         validator: (v) => v!.isEmpty ? (lang == 'Indonesia' ? 'Kategori wajib diisi' : 'Category is required') : null,
                       ),
-
                     const SizedBox(height: 16),
                     Flex(
                       direction: width > 400 ? Axis.horizontal : Axis.vertical,
@@ -362,7 +362,6 @@ class StockScreen extends StatefulWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-
                     _buildLabel(provider.language == 'Indonesia' ? 'Gambar Produk' : 'Product Image', provider.isDarkMode),
                     if (imageBase64.isNotEmpty)
                       Stack(
@@ -393,13 +392,7 @@ class StockScreen extends StatefulWidget {
                             child: ElevatedButton(
                               onPressed: () async {
                                 final picker = ImagePicker();
-                                // Optimized Image Picking for low storage usage
-                                final photo = await picker.pickImage(
-                                  source: ImageSource.gallery,
-                                  maxWidth: 400,
-                                  maxHeight: 400,
-                                  imageQuality: 70,
-                                );
+                                final photo = await picker.pickImage(source: ImageSource.gallery, maxWidth: 400, imageQuality: 70);
                                 if (photo != null) {
                                   final bytes = await photo.readAsBytes();
                                   setDialogState(() => imageBase64 = base64Encode(bytes));
@@ -415,13 +408,7 @@ class StockScreen extends StatefulWidget {
                       InkWell(
                         onTap: () async {
                           final picker = ImagePicker();
-                          // Optimized Image Picking
-                          final photo = await picker.pickImage(
-                            source: ImageSource.gallery,
-                            maxWidth: 400,
-                            maxHeight: 400,
-                            imageQuality: 70,
-                          );
+                          final photo = await picker.pickImage(source: ImageSource.gallery, maxWidth: 400, imageQuality: 70);
                           if (photo != null) {
                             final bytes = await photo.readAsBytes();
                             setDialogState(() => imageBase64 = base64Encode(bytes));
@@ -445,11 +432,9 @@ class StockScreen extends StatefulWidget {
                           ),
                         ),
                       ),
-
                     const SizedBox(height: 16),
                     _buildLabel(provider.tr('description'), provider.isDarkMode),
                     TextFormField(controller: descCtrl, maxLines: 2, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco(lang == 'Indonesia' ? 'Deskripsi singkat produk...' : 'Short product description...')),
-
                     const SizedBox(height: 24),
                     Row(
                       children: [
