@@ -1,57 +1,43 @@
-# Kasirku POS (Point of Sale)
+# Kasirku POS (Point of Sale) - Flutter Version
 
-Aplikasi Kasir Point of Sale (POS) modern yang dibangun menggunakan **Flutter** (Mobile/Web) dan **React** (Web). Aplikasi ini dirancang untuk membantu UMKM atau Toko Kopi dalam mengelola transaksi, stok barang, dan laporan penjualan secara efisien dengan desain antarmuka yang bersih dan responsif.
+Aplikasi Kasir Point of Sale (POS) modern yang dibangun menggunakan **Flutter Full Offline**. Aplikasi ini dirancang khusus untuk membantu UMKM atau Toko Kopi dalam mengelola transaksi, stok barang, dan laporan penjualan secara efisien dengan desain antarmuka yang bersih dan responsif.
 
 ## Fitur Utama
 
 - **Kasir (POS):** Alur transaksi cepat dengan dukungan multi-metode pembayaran (Tunai, QRIS, Kartu/TF).
-- **Manajemen Stok:** Kelola produk, kategori, harga, dan stok barang dengan indikator stok rendah.
-- **Riwayat Transaksi:** Catatan seluruh penjualan dengan detail struk belanja dan fitur Refund.
-- **Laporan Penjualan:** Ringkasan pendapatan harian dalam bentuk visual Bento-style.
-- **Pengaturan Toko:** Kustomisasi nama toko, alamat, logo, dan pengaturan printer struk.
-- **Dark Mode:** Mendukung tampilan tema gelap dan terang untuk kenyamanan mata.
+- **Manajemen Stok:** Kelola produk, kategori, harga, dan stok barang dengan indikator stok rendah dan notifikasi pop-up.
+- **Riwayat Transaksi:** Catatan seluruh penjualan dengan detail struk belanja profesional dan fitur Refund.
+- **Laporan Penjualan:** Ringkasan pendapatan harian dalam bentuk visual Bento-style dengan fitur simulasi ekspor PDF/Excel.
+- **Pengaturan Toko:** Kustomisasi nama toko, alamat, logo (dari galeri), dan pengaturan keamanan kata sandi Kasir.
+- **Dark Mode:** Mendukung tampilan tema gelap yang elegan dengan kontras yang nyaman di mata.
+- **Full Offline:** Data tersimpan 100% di perangkat lokal, tidak membutuhkan koneksi internet.
 
 ## Teknologi yang Digunakan
 
-### Flutter Version (Mobile & Web)
 - **Framework:** Flutter SDK
 - **State Management:** Provider
 - **Local Storage:** Shared Preferences
 - **Icons:** Material Icons & Cupertino Icons
 - **Fonts:** Google Fonts (Source Code Pro)
-
-### React Version (Web)
-- **Framework:** React with TypeScript
-- **Styling:** Tailwind CSS
-- **Icons:** Google Material Symbols
-- **Build Tool:** Vite
+- **Image Handling:** Image Picker (with auto-compression)
 
 ## Cara Menjalankan Proyek
 
-### 1. Flutter Version (Rekomendasi)
 Pastikan Anda sudah menginstal Flutter SDK.
 
 ```bash
-# Jalankan di Chrome
+# Ambil dependensi
+flutter pub get
+
+# Jalankan di Chrome (Web)
 flutter run -d chrome
 
-# Jalankan di Windows Desktop
+# Jalankan di Windows (Desktop)
 flutter run -d windows
 ```
 
-### 2. React Version
-Pastikan Anda sudah menginstal Node.js.
-
-```bash
-# Install dependensi
-npm install
-
-# Jalankan server pengembangan
-npm run dev
-```
-
 ## Kontribusi
-Proyek ini dikembangkan sebagai bagian dari tugas UAS Semester 6 oleh **Xeerodev**.
+Proyek ini dikembangkan sebagai tugas UAS Semester 6 oleh **Xeerodev**.
 
 ---
 *Dibuat dengan ❤️ untuk kemajuan UMKM Indonesia.*
