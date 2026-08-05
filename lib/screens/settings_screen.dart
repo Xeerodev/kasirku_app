@@ -410,6 +410,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showChangePasswordDialog(BuildContext context, PosProvider provider) {
+    final oldPassCtrl = TextEditingController();
     final newPassCtrl = TextEditingController();
     final isDark = provider.isDarkMode;
     showDialog(
@@ -421,18 +422,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Kata sandi saat ini digunakan untuk masuk ke aplikasi Kasirku.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
+            Text('Konfirmasi kata sandi lama sebelum menggantinya.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
             const SizedBox(height: 16),
+            TextField(
+              controller: oldPassCtrl,
+              obscureText: true,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                labelText: 'Kata Sandi Saat Ini',
+                border: const OutlineInputBorder(),
+                labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+              ),
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: newPassCtrl,
               obscureText: true,
               style: TextStyle(color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
                 labelText: 'Kata Sandi Baru',
-                hintText: 'Masukkan minimal 6 karakter',
+                hintText: 'Minimal 6 karakter',
                 border: const OutlineInputBorder(),
                 labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
               ),
             ),
           ],
@@ -441,8 +454,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
           ElevatedButton(
             onPressed: () {
+              if (oldPassCtrl.text != provider.adminPassword) {
+                _showFloatingPopup(context, 'Kata sandi lama salah!', isError: true);
+                return;
+              }
               if (newPassCtrl.text.length < 4) {
-                _showFloatingPopup(context, 'Password terlalu pendek!', isError: true);
+                _showFloatingPopup(context, 'Password baru terlalu pendek!', isError: true);
                 return;
               }
               provider.updatePassword(newPassCtrl.text);

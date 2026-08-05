@@ -14,9 +14,9 @@ class SetupStoreScreen extends StatefulWidget {
 }
 
 class _SetupStoreScreenState extends State<SetupStoreScreen> {
-  final _nameController = TextEditingController(text: 'Kedai Kopi Sentral');
-  final _addressController = TextEditingController(text: 'Jl. Sudirman No. 123, Jakarta Selatan');
-  final _phoneController = TextEditingController(text: '081234567890');
+  final _nameController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _phoneController = TextEditingController();
   String _logoBase64 = '';
 
   @override
@@ -57,17 +57,28 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: 64, height: 64,
-                                decoration: BoxDecoration(color: const Color(0xFF0D47A1), borderRadius: BorderRadius.circular(16)),
-                                child: const Icon(Icons.storefront, color: Colors.white, size: 32),
+                                width: 200,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                                ),
+                                child: Image.network(
+                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                               const SizedBox(height: 32),
                               const Text('Atur Toko Anda', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
                               const SizedBox(height: 16),
                               const Text(
-                                'Bergabunglah dengan ribuan pedagang yang mengelola inventaris, melacak penjualan, dan mengembangkan bisnis mereka bersama Kasirku.',
+                                'Kelola inventaris, lacak penjualan, dan kembangkan bisnis Anda dengan Kasirku POS.',
                                 style: TextStyle(fontSize: 16, color: Color(0xFF45464D), height: 1.5),
                               ),
+                              const SizedBox(height: 24),
+                              _buildInfoPoint(Icons.cloud_off, 'Berbasis Offline', 'Data tersimpan aman di perangkat Anda tanpa perlu internet.'),
+                              _buildInfoPoint(Icons.code, 'Pengembang', 'Dikembangkan oleh Xeerodev untuk solusi UMKM modern.'),
                             ],
                           ),
                           Container(
@@ -92,20 +103,21 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                     padding: EdgeInsets.all(width > 800 ? 48 : 24),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (width <= 800) ...[
-                          Row(
+                        Container(
+                          width: double.infinity,
+                          child: Column(
                             children: [
-                              Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0xFF0D47A1), borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.storefront, color: Colors.white, size: 24)),
-                              const SizedBox(width: 16),
-                              const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Atur Toko Anda', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))), Text('Registrasi toko usaha baru', style: TextStyle(fontSize: 10, color: Color(0xFF45464D)))]),
+                              Container(width: 64, height: 64, decoration: BoxDecoration(color: const Color(0xFF0D47A1), borderRadius: BorderRadius.circular(16)), child: const Icon(Icons.storefront, color: Colors.white, size: 32)),
+                              const SizedBox(height: 16),
+                              const Text('Atur Toko Anda', textAlign: TextAlign.center, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                              const Text('Registrasi toko usaha baru', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Color(0xFF45464D))),
                             ],
                           ),
-                          const SizedBox(height: 32),
-                        ],
+                        ),
+                        const SizedBox(height: 32),
 
-                        const Text('Upload Logo Toko', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        const Align(alignment: Alignment.centerLeft, child: Text('Upload Logo Toko', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold))),
                         const SizedBox(height: 8),
                         InkWell(
                           onTap: () async {
@@ -134,13 +146,13 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                                           child: Image.memory(base64Decode(_logoBase64), width: 50, height: 50, fit: BoxFit.cover),
                                         ),
                                         const SizedBox(width: 12),
-                                        Expanded(
+                                        const Expanded(
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              const Text('Logo Terpilih', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                                              const Text('Klik untuk mengganti', style: TextStyle(fontSize: 9, color: Colors.grey)),
+                                              Text('Logo Terpilih', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                                              Text('Klik untuk mengganti', style: TextStyle(fontSize: 9, color: Colors.grey)),
                                             ],
                                           ),
                                         ),
@@ -168,7 +180,10 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                         const SizedBox(height: 32),
                         ElevatedButton(
                           onPressed: () {
-                            if (_nameController.text.isEmpty) return;
+                            if (_nameController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nama toko wajib diisi!'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
+                              return;
+                            }
                             provider.updateStoreProfile(StoreProfile(
                               name: _nameController.text,
                               address: _addressController.text,
@@ -200,22 +215,47 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
     );
   }
 
+  Widget _buildInfoPoint(IconData icon, String title, String desc) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: const Color(0xFF0D47A1)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0D47A1))),
+                Text(desc, style: const TextStyle(fontSize: 12, color: Color(0xFF45464D))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLabelField(String label, IconData icon, TextEditingController controller, String hint, {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           maxLines: maxLines,
+          style: const TextStyle(fontSize: 14),
           decoration: InputDecoration(
             prefixIcon: Padding(padding: EdgeInsets.only(bottom: maxLines > 1 ? 40 : 0), child: Icon(icon, color: const Color(0xFF2196F3), size: 20)),
             hintText: hint,
+            hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF2196F3))),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: const Color(0xFF2196F3).withOpacity(0.5))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF0D47A1), width: 2)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
       ],
