@@ -220,11 +220,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       const Divider(height: 24, thickness: 1, color: Colors.black12),
                       ...tx.items.map((item) => Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(child: Text('${item.quantity}x ${item.product.name}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black))),
-                            Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold))),
+                                Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
                           ],
                         ),
                       )),
