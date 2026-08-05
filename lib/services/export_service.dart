@@ -56,12 +56,33 @@ class ExportService {
       var excel = Excel.createExcel();
       Sheet sheetObject = excel['Sheet1'];
 
-      sheetObject.appendRow(lang == 'Indonesia'
-        ? ['No. Faktur', 'Waktu', 'Metode', 'Total', 'Status']
-        : ['Invoice No.', 'Time', 'Method', 'Total', 'Status']);
+      // Excel 4.0.0+ uses CellValue wrappers
+      if (lang == 'Indonesia') {
+        sheetObject.appendRow([
+          TextCellValue('No. Faktur'),
+          TextCellValue('Waktu'),
+          TextCellValue('Metode'),
+          TextCellValue('Total'),
+          TextCellValue('Status'),
+        ]);
+      } else {
+        sheetObject.appendRow([
+          TextCellValue('Invoice No.'),
+          TextCellValue('Time'),
+          TextCellValue('Method'),
+          TextCellValue('Total'),
+          TextCellValue('Status'),
+        ]);
+      }
 
       for (var t in transactions) {
-        sheetObject.appendRow([t.invoiceNumber, t.timeString, t.paymentMethod, t.total, t.status]);
+        sheetObject.appendRow([
+          TextCellValue(t.invoiceNumber),
+          TextCellValue(t.timeString),
+          TextCellValue(t.paymentMethod),
+          DoubleCellValue(t.total),
+          TextCellValue(t.status),
+        ]);
       }
 
       final output = await _getAppFolder();
