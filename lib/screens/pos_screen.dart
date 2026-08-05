@@ -747,11 +747,17 @@ class _PosScreenState extends State<PosScreen> {
                             ),
                             ...trx.items.map((item) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(child: Text('${item.quantity}x ${item.product.name}', style: GoogleFonts.sourceCodePro(fontSize: 10))),
-                                  Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10)),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(child: Text('${item.quantity}x ${item.product.name}', style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold))),
+                                      Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                  Text('   @ ${currencyFormatter.format(item.product.price)}', style: GoogleFonts.sourceCodePro(fontSize: 8, color: Colors.black54)),
                                 ],
                               ),
                             )),

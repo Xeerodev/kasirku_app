@@ -425,6 +425,13 @@ class _StockScreenState extends State<StockScreen> {
                               description: descCtrl.text,
                             ));
                             Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(productToEdit == null ? 'Produk berhasil ditambahkan!' : 'Perubahan produk berhasil disimpan!'),
+                                backgroundColor: const Color(0xFF0D47A1),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
                           },
                           child: const Text('Simpan Produk'),
                         ),
