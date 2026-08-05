@@ -242,7 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () => _handleBackupJson(context, provider),
                     icon: const Icon(Icons.backup),
                     label: Text(provider.language == 'Indonesia' ? 'Cadangkan Data JSON' : 'Backup JSON Data'),
                     style: OutlinedButton.styleFrom(

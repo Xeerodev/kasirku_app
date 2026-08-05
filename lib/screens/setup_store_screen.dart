@@ -262,7 +262,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: const TextStyle(fontSize: 14),
+          style: const TextStyle(fontSize: 14, color: Colors.black87), // FORCED DARK TEXT COLOR
           decoration: InputDecoration(
             prefixIcon: Padding(padding: EdgeInsets.only(bottom: maxLines > 1 ? 40 : 0), child: Icon(icon, color: const Color(0xFF2196F3), size: 20)),
             hintText: hint,

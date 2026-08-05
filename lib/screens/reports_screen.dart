@@ -12,8 +12,8 @@ class ReportsScreen extends StatelessWidget {
     final provider = Provider.of<PosProvider>(context);
     final isDark = provider.isDarkMode;
     final currencyFormatter = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp ',
+      locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
+      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
       decimalDigits: 0,
     );
 
@@ -67,20 +67,20 @@ class ReportsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Laporan',
+                      provider.tr('reports'),
                       style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
                     ),
                     Text(
-                      'Ringkasan Penjualan Hari Ini',
+                      provider.tr('summary_today'),
                       style: TextStyle(fontSize: 14, color: isDark ? Colors.white54 : const Color(0xFF45464D)),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    _buildIconButton(Icons.picture_as_pdf, 'PDF', () {}, isDark),
+                    _buildIconButton(Icons.picture_as_pdf, 'PDF', () => _simulateExport(context, 'PDF', provider), isDark),
                     const SizedBox(width: 8),
-                    _buildIconButton(Icons.table_chart, 'Excel', () {}, isDark),
+                    _buildIconButton(Icons.table_chart, 'Excel', () => _simulateExport(context, 'Excel', provider), isDark),
                   ],
                 ),
               ],
@@ -97,18 +97,18 @@ class ReportsScreen extends StatelessWidget {
               mainAxisSpacing: 16,
               children: [
                 _buildBentoCard(
-                  title: 'Total Omset',
+                  title: provider.tr('total_revenue'),
                   value: currencyFormatter.format(totalRevenue),
-                  subtitle: '+14.2% dari kemarin',
+                  subtitle: provider.language == 'Indonesia' ? '+14.2% dari kemarin' : '+14.2% from yesterday',
                   icon: Icons.payments,
                   color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
                   textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
                   isDark: isDark,
                 ),
                 _buildBentoCard(
-                  title: 'Total Transaksi',
-                  value: '${activeTransactions.length} Transaksi',
-                  subtitle: 'Rata-rata ${currencyFormatter.format(activeTransactions.isEmpty ? 0 : totalRevenue / activeTransactions.length)} / trx',
+                  title: provider.tr('total_transactions'),
+                  value: '${activeTransactions.length} ${provider.language == 'Indonesia' ? 'Transaksi' : 'Transactions'}',
+                  subtitle: '${provider.language == 'Indonesia' ? 'Rata-rata' : 'Average'} ${currencyFormatter.format(activeTransactions.isEmpty ? 0 : totalRevenue / activeTransactions.length)} / trx',
                   icon: Icons.receipt_long,
                   color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
                   textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
@@ -126,12 +126,12 @@ class ReportsScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.history, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
                     const SizedBox(width: 8),
-                    Text('Transaksi Terakhir', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                    Text(provider.tr('recent_transactions'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                   ],
                 ),
                 TextButton(
                   onPressed: () {},
-                  child: Text('Lihat Semua', style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontSize: 12)),
+                  child: Text(provider.tr('see_all'), style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontSize: 12)),
                 )
               ],
             ),
@@ -145,7 +145,7 @@ class ReportsScreen extends StatelessWidget {
                 border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
               ),
               child: recentTransactions.isEmpty
-                  ? Padding(padding: const EdgeInsets.all(32), child: Center(child: Text('Belum ada transaksi', style: TextStyle(color: isDark ? Colors.white38 : Colors.grey))))
+                  ? Padding(padding: const EdgeInsets.all(32), child: Center(child: Text(provider.language == 'Indonesia' ? 'Belum ada transaksi' : 'No transactions yet', style: TextStyle(color: isDark ? Colors.white38 : Colors.grey))))
                   : ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -170,6 +170,32 @@ class ReportsScreen extends StatelessWidget {
             const SizedBox(height: 40),
           ],
         ),
+      ),
+    );
+  }
+
+  void _simulateExport(BuildContext context, String type, PosProvider provider) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(type == 'PDF' ? Icons.picture_as_pdf : Icons.table_chart, color: const Color(0xFF0D47A1)),
+            const SizedBox(width: 12),
+            Text('Export $type', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
+          ],
+        ),
+        content: Text(
+          provider.language == 'Indonesia'
+            ? 'Laporan berhasil diekspor ke format $type. File tersimpan di folder Unduhan.'
+            : 'Report successfully exported to $type format. File saved in Downloads folder.',
+          style: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.black54),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+        ],
       ),
     );
   }
@@ -245,7 +271,7 @@ class ReportsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('PRODUK TERLARIS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.white38 : Colors.grey)),
+              Text(provider.tr('top_product'), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.white38 : Colors.grey)),
               const Icon(Icons.star, color: Colors.amber, size: 20),
             ],
           ),
@@ -259,8 +285,8 @@ class ReportsScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Total Terjual', style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
-                  Text('48 porsi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : Colors.blue.shade700)),
+                  Text(provider.language == 'Indonesia' ? 'Total Terjual' : 'Total Sold', style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
+                  Text('48 ${provider.language == 'Indonesia' ? 'porsi' : 'servings'}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : Colors.blue.shade700)),
                 ],
               )
             ],

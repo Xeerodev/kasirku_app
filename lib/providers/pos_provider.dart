@@ -159,12 +159,16 @@ class PosProvider with ChangeNotifier {
       'address': 'Alamat',
       'phone': 'Nomor Telepon',
       'cashier_name': 'Nama Kasir',
+      'summary_today': 'Ringkasan Penjualan Hari Ini',
+      'invoice_detail': 'Detail Faktur',
+      'refund': 'Refund',
+      'paid': 'Lunas',
     },
     'English': {
       'cashier': 'POS',
       'stock': 'Inventory',
       'history': 'History',
-      'reports': 'Analytics',
+      'reports': 'Reports',
       'settings': 'Settings',
       'search_product': 'Search product...',
       'empty_cart': 'Cart is Empty',
@@ -210,6 +214,10 @@ class PosProvider with ChangeNotifier {
       'address': 'Address',
       'phone': 'Phone Number',
       'cashier_name': 'Cashier Name',
+      'summary_today': 'Today\'s Sales Summary',
+      'invoice_detail': 'Invoice Detail',
+      'refund': 'Refund',
+      'paid': 'Paid',
     }
   };
 
@@ -399,6 +407,21 @@ class PosProvider with ChangeNotifier {
     _storeProfile = profile;
     _saveToPrefs();
     notifyListeners();
+  }
+
+  String getBackupJson() {
+    return jsonEncode({
+      'storeProfile': _storeProfile.toJson(),
+      'products': _products.map((p) => p.toJson()).toList(),
+      'transactions': _transactions.map((t) => t.toJson()).toList(),
+      'settings': {
+        'printer': _activePrinter,
+        'autoPrint': _autoPrintReceipt,
+        'footer': _footerMessage,
+        'language': _language,
+        'darkMode': _isDarkMode,
+      }
+    });
   }
 
   Future<void> _saveToPrefs() async {
