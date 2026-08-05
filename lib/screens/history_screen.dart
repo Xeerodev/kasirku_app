@@ -247,6 +247,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                          // Paper Receipt Simulation
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
@@ -254,13 +255,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
                           ),
                           child: Column(
                             children: [
-                              Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black), textAlign: TextAlign.center),
-                              Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 8, color: Colors.grey), textAlign: TextAlign.center),
-                              const Divider(height: 24, thickness: 1, color: Colors.black12),
+                              Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black)),
+                              Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
+                              Text('Telp: ${provider.storeProfile.phone}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Column(
@@ -269,19 +271,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Flexible(child: Text('No: ${tx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black))),
-                                        Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))
-                                      ]
+                                        Flexible(child: Text('No: ${tx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black))),
+                                        Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))
+                                      ],
                                     ),
-                                    Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
-                                    Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
-                                    Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
                                   ],
                                 ),
                               ),
-                              const Divider(height: 24, thickness: 1, color: Colors.black12),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
                               ...tx.items.map((item) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                padding: const EdgeInsets.symmetric(vertical: 2),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -296,12 +298,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   ],
                                 ),
                               )),
-                              const Divider(height: 24, thickness: 1, color: Colors.black12),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black)), Text(currencyFormatter.format(tx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black))]),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black)), Text(currencyFormatter.format(tx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))]),
                               if (tx.paymentMethod == 'Tunai' || tx.paymentMethod == 'Cash') ...[
-                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.paymentAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
-                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(tx.paymentAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(tx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
                               ],
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
+                              Text(provider.footerMessage, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
                             ],
                           ),
                         ),

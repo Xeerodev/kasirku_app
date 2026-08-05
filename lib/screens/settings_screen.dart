@@ -302,7 +302,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         logoUrl: provider.storeProfile.logoUrl,
                         isConfigured: true,
                       ));
-                      _showFloatingPopup(context, lang == 'Indonesia' ? 'Profil berhasil disimpan' : 'Profile saved successfully', isError: false);
+                      provider.updatePrinterSettings(footer: _footerController.text);
+                      _showFloatingPopup(context, lang == 'Indonesia' ? 'Seluruh pengaturan berhasil disimpan' : 'All settings saved successfully', isError: false);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061A4), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                     child: Text(lang == 'Indonesia' ? 'Simpan Profil & Kasir' : 'Save Profile & Cashier', style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -379,6 +380,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildTextField(controller: _footerController, label: lang == 'Indonesia' ? 'Pesan Footer Struk' : 'Receipt Footer Message', maxLines: 3, isDark: isDark),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      provider.updatePrinterSettings(footer: _footerController.text);
+                      _showFloatingPopup(context, lang == 'Indonesia' ? 'Pengaturan struk berhasil disimpan' : 'Receipt settings saved', isError: false);
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061A4), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(44), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    child: Text(lang == 'Indonesia' ? 'Simpan Footer Struk' : 'Save Footer Message', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  ),
                 ],
               ),
             ),
