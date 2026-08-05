@@ -15,6 +15,7 @@ class StockScreen extends StatefulWidget {
 
 class _StockScreenState extends State<StockScreen> {
   String _searchQuery = '';
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -275,175 +276,213 @@ class _StockScreenState extends State<StockScreen> {
             constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 500),
             padding: const EdgeInsets.all(24),
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(productToEdit == null ? 'Tambah Produk Baru' : 'Edit Produk', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
-                      IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: provider.isDarkMode ? Colors.white54 : Colors.black54)),
-                    ],
-                  ),
-                  const Divider(),
-                  const SizedBox(height: 16),
-
-                  _buildLabel('Nama Produk', provider.isDarkMode),
-                  TextField(controller: nameCtrl, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco('cth. Latte Special')),
-                  const SizedBox(height: 16),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildLabel('Kategori', provider.isDarkMode),
-                      TextButton(
-                        onPressed: () => setDialogState(() => isCustom = !isCustom),
-                        child: Text(isCustom ? 'Pilih dari Daftar' : '+ Ketik Manual', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
-                  if (!isCustom)
-                    DropdownButtonFormField<String>(
-                      dropdownColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
-                      value: provider.existingCategories.contains(selectedCat) ? selectedCat : provider.existingCategories.first,
-                      style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
-                      items: provider.existingCategories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                      onChanged: (val) => setDialogState(() => selectedCat = val!),
-                      decoration: _inputDeco(''),
-                    )
-                  else
-                    TextField(
-                      onChanged: (v) => selectedCat = v,
-                      style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
-                      decoration: _inputDeco('Tulis nama kategori baru...'),
-                    ),
-
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildLabel('Harga (Rp)', provider.isDarkMode), TextField(controller: priceCtrl, keyboardType: TextInputType.number, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco('25000'))])),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildLabel('Jumlah Stok', provider.isDarkMode), TextField(controller: stockCtrl, keyboardType: TextInputType.number, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco('50'))])),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  _buildLabel('Gambar Produk', provider.isDarkMode),
-                  if (imageBase64.isNotEmpty)
-                    Stack(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          height: 120,
+                        Text(productToEdit == null ? 'Tambah Produk Baru' : 'Edit Produk', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
+                        IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: provider.isDarkMode ? Colors.white54 : Colors.black54)),
+                      ],
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 16),
+
+                    _buildLabel('Nama Produk', provider.isDarkMode),
+                    TextFormField(
+                      controller: nameCtrl,
+                      style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+                      decoration: _inputDeco('cth. Latte Special'),
+                      validator: (v) => v!.isEmpty ? 'Nama produk wajib diisi' : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildLabel('Kategori', provider.isDarkMode),
+                        TextButton(
+                          onPressed: () => setDialogState(() => isCustom = !isCustom),
+                          child: Text(isCustom ? 'Pilih dari Daftar' : '+ Ketik Manual', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                    if (!isCustom)
+                      DropdownButtonFormField<String>(
+                        dropdownColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+                        value: provider.existingCategories.contains(selectedCat) ? selectedCat : provider.existingCategories.first,
+                        style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+                        items: provider.existingCategories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                        onChanged: (val) => setDialogState(() => selectedCat = val!),
+                        decoration: _inputDeco(''),
+                      )
+                    else
+                      TextFormField(
+                        onChanged: (v) => selectedCat = v,
+                        style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+                        decoration: _inputDeco('Tulis nama kategori baru...'),
+                        validator: (v) => v!.isEmpty ? 'Kategori wajib diisi' : null,
+                      ),
+
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildLabel('Harga (Rp)', provider.isDarkMode),
+                              TextFormField(
+                                controller: priceCtrl,
+                                keyboardType: TextInputType.number,
+                                style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+                                decoration: _inputDeco('25000'),
+                                validator: (v) => v!.isEmpty ? 'Harga wajib diisi' : null,
+                              )
+                            ]
+                          )
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildLabel('Jumlah Stok', provider.isDarkMode),
+                              TextFormField(
+                                controller: stockCtrl,
+                                keyboardType: TextInputType.number,
+                                style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+                                decoration: _inputDeco('50'),
+                                validator: (v) => v!.isEmpty ? 'Stok wajib diisi' : null,
+                              )
+                            ]
+                          )
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    _buildLabel('Gambar Produk', provider.isDarkMode),
+                    if (imageBase64.isNotEmpty)
+                      Stack(
+                        children: [
+                          Container(
+                            height: 120,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.grey.shade300),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: imageBase64.startsWith('http')
+                                  ? Image.network(imageBase64, fit: BoxFit.cover)
+                                  : Image.memory(base64Decode(imageBase64), fit: BoxFit.cover),
+                            ),
+                          ),
+                          Positioned(
+                            top: 8, right: 8,
+                            child: GestureDetector(
+                              onTap: () => setDialogState(() => imageBase64 = ''),
+                              child: Container(padding: const EdgeInsets.all(4), decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 8, right: 8,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final picker = ImagePicker();
+                                // Optimized Image Picking for low storage usage
+                                final photo = await picker.pickImage(
+                                  source: ImageSource.gallery,
+                                  maxWidth: 400,
+                                  maxHeight: 400,
+                                  imageQuality: 70,
+                                );
+                                if (photo != null) {
+                                  final bytes = await photo.readAsBytes();
+                                  setDialogState(() => imageBase64 = base64Encode(bytes));
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), minimumSize: Size.zero),
+                              child: const Text('Ganti', style: TextStyle(fontSize: 10)),
+                            ),
+                          )
+                        ],
+                      )
+                    else
+                      InkWell(
+                        onTap: () async {
+                          final picker = ImagePicker();
+                          // Optimized Image Picking
+                          final photo = await picker.pickImage(
+                            source: ImageSource.gallery,
+                            maxWidth: 400,
+                            maxHeight: 400,
+                            imageQuality: 70,
+                          );
+                          if (photo != null) {
+                            final bytes = await photo.readAsBytes();
+                            setDialogState(() => imageBase64 = base64Encode(bytes));
+                          }
+                        },
+                        child: Container(
+                          height: 100,
                           width: double.infinity,
                           decoration: BoxDecoration(
+                            color: provider.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFFF8F9FF),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.grey.shade300),
+                            border: Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.grey.shade300, style: BorderStyle.solid),
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: imageBase64.startsWith('http')
-                                ? Image.network(imageBase64, fit: BoxFit.cover)
-                                : Image.memory(base64Decode(imageBase64), fit: BoxFit.cover),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.cloud_upload, color: Color(0xFF0D47A1), size: 32),
+                              Text('Upload Gambar dari Galeri', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white70 : Colors.black87)),
+                              Text('JPG, PNG, WEBP (Auto-Compressed)', style: TextStyle(fontSize: 9, color: provider.isDarkMode ? Colors.white38 : Colors.grey.shade400)),
+                            ],
                           ),
                         ),
-                        Positioned(
-                          top: 8, right: 8,
-                          child: GestureDetector(
-                            onTap: () => setDialogState(() => imageBase64 = ''),
-                            child: Container(padding: const EdgeInsets.all(4), decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 16, color: Colors.white)),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 8, right: 8,
+                      ),
+
+                    const SizedBox(height: 16),
+                    _buildLabel('Deskripsi Produk', provider.isDarkMode),
+                    TextFormField(controller: descCtrl, maxLines: 2, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco('Deskripsi singkat produk...')),
+
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Batal'))),
+                        const SizedBox(width: 12),
+                        Expanded(
                           child: ElevatedButton(
-                            onPressed: () async {
-                              final picker = ImagePicker();
-                              // Optimized Image Picking for low storage usage
-                              final photo = await picker.pickImage(
-                                source: ImageSource.gallery,
-                                maxWidth: 400,
-                                maxHeight: 400,
-                                imageQuality: 70,
-                              );
-                              if (photo != null) {
-                                final bytes = await photo.readAsBytes();
-                                setDialogState(() => imageBase64 = base64Encode(bytes));
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                provider.saveProduct(Product(
+                                  id: productToEdit?.id ?? '',
+                                  name: nameCtrl.text,
+                                  category: selectedCat,
+                                  price: double.tryParse(priceCtrl.text) ?? 0,
+                                  stock: int.tryParse(stockCtrl.text) ?? 0,
+                                  image: imageBase64,
+                                  description: descCtrl.text,
+                                ));
+                                Navigator.pop(ctx);
+                                _showFloatingPopup(context, productToEdit == null ? 'Produk berhasil ditambahkan!' : 'Perubahan produk berhasil disimpan!', isError: false);
                               }
                             },
-                            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), minimumSize: Size.zero),
-                            child: const Text('Ganti', style: TextStyle(fontSize: 10)),
+                            child: const Text('Simpan Produk'),
                           ),
-                        )
+                        ),
                       ],
-                    )
-                  else
-                    InkWell(
-                      onTap: () async {
-                        final picker = ImagePicker();
-                        // Optimized Image Picking
-                        final photo = await picker.pickImage(
-                          source: ImageSource.gallery,
-                          maxWidth: 400,
-                          maxHeight: 400,
-                          imageQuality: 70,
-                        );
-                        if (photo != null) {
-                          final bytes = await photo.readAsBytes();
-                          setDialogState(() => imageBase64 = base64Encode(bytes));
-                        }
-                      },
-                      child: Container(
-                        height: 100,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: provider.isDarkMode ? Colors.white.withOpacity(0.05) : const Color(0xFFF8F9FF),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.grey.shade300, style: BorderStyle.solid),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.cloud_upload, color: Color(0xFF0D47A1), size: 32),
-                            Text('Upload Gambar dari Galeri', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white70 : Colors.black87)),
-                            Text('JPG, PNG, WEBP (Auto-Compressed)', style: TextStyle(fontSize: 9, color: provider.isDarkMode ? Colors.white38 : Colors.grey.shade400)),
-                          ],
-                        ),
-                      ),
                     ),
-
-                  const SizedBox(height: 16),
-                  _buildLabel('Deskripsi Produk', provider.isDarkMode),
-                  TextField(controller: descCtrl, maxLines: 2, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco('Deskripsi singkat produk...')),
-
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Batal'))),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                          onPressed: () {
-                            if (nameCtrl.text.isEmpty || priceCtrl.text.isEmpty || stockCtrl.text.isEmpty) return;
-                            provider.saveProduct(Product(
-                              id: productToEdit?.id ?? '',
-                              name: nameCtrl.text,
-                              category: selectedCat,
-                              price: double.tryParse(priceCtrl.text) ?? 0,
-                              stock: int.tryParse(stockCtrl.text) ?? 0,
-                              image: imageBase64,
-                              description: descCtrl.text,
-                            ));
-                            Navigator.pop(ctx);
-                            _showFloatingPopup(context, productToEdit == null ? 'Produk berhasil ditambahkan!' : 'Perubahan produk berhasil disimpan!', isError: false);
-                          },
-                          child: const Text('Simpan Produk'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
