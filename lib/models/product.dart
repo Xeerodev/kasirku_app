@@ -1,11 +1,15 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 class Product {
   final String id;
   final String name;
   final String category;
   final double price;
   final int stock;
-  final String image;
+  final String image; // base64 or URL
   final String description;
+  Uint8List? _cachedBytes;
 
   Product({
     required this.id,
@@ -16,6 +20,19 @@ class Product {
     this.image = '',
     this.description = '',
   });
+
+  Uint8List? get imageBytes {
+    if (_cachedBytes != null) return _cachedBytes;
+    if (image.isNotEmpty && !image.startsWith('http')) {
+      try {
+        _cachedBytes = base64Decode(image);
+        return _cachedBytes;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
 
   Product copyWith({
     String? id,
