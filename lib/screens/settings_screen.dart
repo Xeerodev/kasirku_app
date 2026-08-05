@@ -224,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ElevatedButton.icon(
                     onPressed: () => _showChangePasswordDialog(context, provider),
                     icon: const Icon(Icons.lock_reset),
-                    label: const Text('Ubah Kata Sandi Admin'),
+                    label: const Text('Ubah Kata Sandi Kasir'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0D47A1),
                       foregroundColor: Colors.white,
@@ -418,7 +418,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Ubah Kata Sandi Admin', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+        title: Text('Ubah Kata Sandi Kasir', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -432,7 +432,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 labelText: 'Kata Sandi Saat Ini',
                 border: const OutlineInputBorder(),
                 labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300)),
               ),
             ),
             const SizedBox(height: 12),
@@ -445,7 +445,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 hintText: 'Minimal 6 karakter',
                 border: const OutlineInputBorder(),
                 labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300)),
               ),
             ),
           ],
