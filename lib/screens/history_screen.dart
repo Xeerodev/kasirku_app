@@ -187,148 +187,166 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Future<void> _handlePrint(BuildContext context, TransactionModel tx, StoreProfile store, String lang) async {
-    if (kIsWeb) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Fitur print tidak didukung di web' : 'Print feature not supported on web')));
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Sedang mencetak...' : 'Printing...')));
-    final result = await _printerService.printReceipt(tx, store);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result), behavior: SnackBarBehavior.floating));
-    }
-  }
-
   void _showTransactionDetail(BuildContext context, TransactionModel tx, PosProvider provider) {
     final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     final isDark = provider.isDarkMode;
     final lang = provider.language;
+    String _printStatus = "";
 
     showDialog(
       context: context,
-      builder: (ctx) => Dialog(
-        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        child: Container(
-          width: double.infinity,
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8, maxWidth: 450),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      provider.tr('invoice_detail'),
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
-                      overflow: TextOverflow.ellipsis,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          child: Container(
+            width: double.infinity,
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8, maxWidth: 450),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        provider.tr('invoice_detail'),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.black54)),
+                  ],
+                ),
+
+                if (_printStatus.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _printStatus.contains("berhasil") || _printStatus.contains("Success") ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(_printStatus.contains("berhasil") || _printStatus.contains("Success") ? Icons.check_circle : Icons.error,
+                             size: 14, color: _printStatus.contains("berhasil") || _printStatus.contains("Success") ? Colors.green : Colors.red),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(_printStatus, style: TextStyle(fontSize: 11, color: _printStatus.contains("berhasil") || _printStatus.contains("Success") ? Colors.green : Colors.red, fontWeight: FontWeight.bold))),
+                      ],
                     ),
                   ),
-                  IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.black54)),
                 ],
-              ),
-              const Divider(),
-              const SizedBox(height: 16),
 
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black), textAlign: TextAlign.center),
-                            Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 8, color: Colors.grey), textAlign: TextAlign.center),
-                            const Divider(height: 24, thickness: 1, color: Colors.black12),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(child: Text('No: ${tx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black))),
-                                      Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))
-                                    ]
-                                  ),
-                                  Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
-                                  Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
-                                  Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
-                                ],
+                const Divider(),
+                const SizedBox(height: 16),
+
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+                          ),
+                          child: Column(
+                            children: [
+                              Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black), textAlign: TextAlign.center),
+                              Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 8, color: Colors.grey), textAlign: TextAlign.center),
+                              const Divider(height: 24, thickness: 1, color: Colors.black12),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Flexible(child: Text('No: ${tx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black))),
+                                        Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))
+                                      ]
+                                    ),
+                                    Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Divider(height: 24, thickness: 1, color: Colors.black12),
-                            ...tx.items.map((item) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black))),
-                                      Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
-                                    ],
-                                  ),
-                                  Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
-                                ],
-                              ),
-                            )),
-                            const Divider(height: 24, thickness: 1, color: Colors.black12),
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black)), Text(currencyFormatter.format(tx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black))]),
-                            if (tx.paymentMethod == 'Tunai' || tx.paymentMethod == 'Cash') ...[
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.paymentAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                              const Divider(height: 24, thickness: 1, color: Colors.black12),
+                              ...tx.items.map((item) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black))),
+                                        Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
+                                      ],
+                                    ),
+                                    Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
+                                  ],
+                                ),
+                              )),
+                              const Divider(height: 24, thickness: 1, color: Colors.black12),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black)), Text(currencyFormatter.format(tx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black))]),
+                              if (tx.paymentMethod == 'Tunai' || tx.paymentMethod == 'Cash') ...[
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.paymentAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                              ],
                             ],
-                          ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                           if (kIsWeb) {
+                             setDialogState(() => _printStatus = lang == 'Indonesia' ? "Web tidak dukung print" : "Web print not supported");
+                             return;
+                           }
+                           setDialogState(() => _printStatus = lang == 'Indonesia' ? "Sedang mencetak..." : "Printing...");
+                           final result = await _printerService.printReceipt(tx, provider.storeProfile);
+                           setDialogState(() => _printStatus = result);
+                        },
+                        icon: const Icon(Icons.print, size: 16),
+                        label: Text(provider.tr('print'), style: const TextStyle(fontSize: 12)),
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
+                      ),
+                    ),
+                    if (tx.status == 'Lunas') ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            provider.toggleRefund(tx.id);
+                            Navigator.pop(ctx);
+                          },
+                          icon: const Icon(Icons.assignment_return, size: 16),
+                          label: Text(provider.tr('refund'), style: const TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _handlePrint(context, tx, provider.storeProfile, lang),
-                      icon: const Icon(Icons.print, size: 16),
-                      label: Text(provider.tr('print'), style: const TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
-                    ),
-                  ),
-                  if (tx.status == 'Lunas') ...[
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          provider.toggleRefund(tx.id);
-                          Navigator.pop(ctx);
-                        },
-                        icon: const Icon(Icons.assignment_return, size: 16),
-                        label: Text(provider.tr('refund'), style: const TextStyle(fontSize: 12)),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
-                      ),
-                    ),
                   ],
-                ],
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

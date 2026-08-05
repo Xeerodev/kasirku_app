@@ -700,19 +700,6 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  Future<void> _handlePrint(BuildContext context, TransactionModel trx, StoreProfile store, String lang) async {
-    if (kIsWeb) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Fitur print tidak didukung di web' : 'Print feature not supported on web')));
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Sedang mencetak...' : 'Printing...')));
-    final result = await _printerService.printReceipt(trx, store);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result), behavior: SnackBarBehavior.floating));
-    }
-  }
-
   void _showSuccessReceipt(BuildContext context, TransactionModel trx, PosProvider provider, double paidAmount) {
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
@@ -721,116 +708,147 @@ class _PosScreenState extends State<PosScreen> {
     );
     final isDark = provider.isDarkMode;
     final lang = provider.language;
+    String _printStatus = "";
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => Dialog(
-        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 400),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64, height: 64,
-                decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
-                child: const Icon(Icons.check_circle, color: Colors.green, size: 40),
-              ),
-              const SizedBox(height: 12),
-              Text(lang == 'Indonesia' ? 'Transaksi Berhasil!' : 'Transaction Success!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-              Text(trx.invoiceNumber, style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
-              const SizedBox(height: 16),
-
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Paper Receipt Simulation
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black)),
-                            Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
-                            Text('Telp: ${provider.storeProfile.phone}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
-                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('No: ${trx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
-                                  Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${trx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
-                                  Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${trx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
-                                  Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${trx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
-                            ...trx.items.map((item) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black))),
-                                      Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
-                                    ],
-                                  ),
-                                  Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
-                                ],
-                              ),
-                            )),
-                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black)), Text(currencyFormatter.format(trx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))]),
-                            if (trx.paymentMethod == 'Tunai' || trx.paymentMethod == 'Cash') ...[
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(paidAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(trx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
-                            ],
-                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
-                            Text(provider.footerMessage, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 400),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64, height: 64,
+                  decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
+                  child: const Icon(Icons.check_circle, color: Colors.green, size: 40),
                 ),
-              ),
+                const SizedBox(height: 12),
+                Text(lang == 'Indonesia' ? 'Transaksi Berhasil!' : 'Transaction Success!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                Text(trx.invoiceNumber, style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
 
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _handlePrint(context, trx, provider.storeProfile, lang),
-                      icon: const Icon(Icons.print, size: 16),
-                      label: Text(lang == 'Indonesia' ? 'Cetak' : 'Print'),
-                      style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
+                if (_printStatus.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _printStatus.contains("berhasil") || _printStatus.contains("Success") ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
-                      child: Text(lang == 'Indonesia' ? 'Selesai' : 'Done'),
+                    child: Row(
+                      children: [
+                        Icon(_printStatus.contains("berhasil") || _printStatus.contains("Success") ? Icons.check_circle : Icons.error,
+                             size: 14, color: _printStatus.contains("berhasil") || _printStatus.contains("Success") ? Colors.green : Colors.red),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(_printStatus, style: TextStyle(fontSize: 11, color: _printStatus.contains("berhasil") || _printStatus.contains("Success") ? Colors.green : Colors.red, fontWeight: FontWeight.bold))),
+                      ],
                     ),
                   ),
                 ],
-              )
-            ],
+
+                const SizedBox(height: 16),
+
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Paper Receipt Simulation
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                          ),
+                          child: Column(
+                            children: [
+                              Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black)),
+                              Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
+                              Text('Telp: ${provider.storeProfile.phone}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('No: ${trx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${trx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${trx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                    Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${trx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                  ],
+                                ),
+                              ),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
+                              ...trx.items.map((item) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black))),
+                                        Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
+                                      ],
+                                    ),
+                                    Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
+                                  ],
+                                ),
+                              )),
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black)), Text(currencyFormatter.format(trx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))]),
+                              if (trx.paymentMethod == 'Tunai' || trx.paymentMethod == 'Cash') ...[
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(provider.language == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(paidAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(provider.language == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(trx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
+                              ],
+                              const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
+                              Text(provider.footerMessage, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                           if (kIsWeb) {
+                             setDialogState(() => _printStatus = lang == 'Indonesia' ? "Web tidak dukung print" : "Web print not supported");
+                             return;
+                           }
+                           setDialogState(() => _printStatus = lang == 'Indonesia' ? "Sedang mencetak..." : "Printing...");
+                           final result = await _printerService.printReceipt(trx, provider.storeProfile);
+                           setDialogState(() => _printStatus = result);
+                        },
+                        icon: const Icon(Icons.print, size: 16),
+                        label: Text(lang == 'Indonesia' ? 'Cetak' : 'Print'),
+                        style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
+                        child: Text(lang == 'Indonesia' ? 'Selesai' : 'Done'),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
