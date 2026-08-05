@@ -119,10 +119,42 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                           child: Container(
                             height: 80,
                             width: double.infinity,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF2196F3), style: BorderStyle.solid), borderSide: BorderSide(color: const Color(0xFF2196F3).withOpacity(0.5))),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.5)),
+                            ),
                             child: _logoBase64.isNotEmpty
-                                ? Row(padding: const EdgeInsets.symmetric(horizontal: 16), children: [ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.memory(base64Decode(_logoBase64), width: 50, height: 50, fit: BoxFit.cover)), const SizedBox(width: 12), const Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Logo Terpilih', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))), Text('Klik untuk mengganti', style: TextStyle(fontSize: 9, color: Colors.grey))])), const Icon(Icons.cloud_upload, color: Color(0xFF2196F3))])
-                                : const Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.cloud_upload, color: Color(0xFF2196F3), size: 24), Text('Upload Logo (Opsional)', style: TextStyle(fontSize: 11, color: Color(0xFF45464D)))]),
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Image.memory(base64Decode(_logoBase64), width: 50, height: 50, fit: BoxFit.cover),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Logo Terpilih', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                                              const Text('Klik untuk mengganti', style: TextStyle(fontSize: 9, color: Colors.grey)),
+                                            ],
+                                          ),
+                                        ),
+                                        const Icon(Icons.cloud_upload, color: Color(0xFF2196F3)),
+                                      ],
+                                    ),
+                                  )
+                                : const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.cloud_upload, color: Color(0xFF2196F3), size: 24),
+                                      Text('Upload Logo (Opsional)', style: TextStyle(fontSize: 11, color: Color(0xFF45464D))),
+                                    ],
+                                  ),
                           ),
                         ),
 
