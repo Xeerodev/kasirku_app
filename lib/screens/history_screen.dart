@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/pos_provider.dart';
 import '../models/transaction.dart';
 
@@ -31,107 +32,133 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return Scaffold(
       backgroundColor: provider.isDarkMode ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Row(
-          children: [
-            Icon(Icons.history, color: Color(0xFF0D47A1)),
-            SizedBox(width: 8),
-            Text('Riwayat Transaksi', style: TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Daftar seluruh transaksi penjualan toko', style: TextStyle(fontSize: 12, color: Color(0xFF45464D))),
-            const SizedBox(height: 16),
+            // Header
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                const Icon(Icons.history, color: Color(0xFF0D47A1), size: 32),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Riwayat Transaksi',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
+                    ),
+                    const Text('Daftar seluruh transaksi penjualan toko', style: TextStyle(fontSize: 12, color: Color(0xFF45464D))),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
 
             // Search Bar
             Container(
+              height: 52,
               decoration: BoxDecoration(
                 color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.black.withOpacity(0.05)),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 2))],
               ),
               child: TextField(
                 onChanged: (val) => setState(() => _searchQuery = val),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Cari no. faktur atau metode...',
-                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                  suffixIcon: _searchQuery.isNotEmpty ? IconButton(icon: const Icon(Icons.close, size: 18), onPressed: () => setState(() => _searchQuery = '')) : null,
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
-                  border: Border.all(color: Colors.black.withOpacity(0.05)),
-                ),
-                child: filteredTransactions.isEmpty
-                    ? const Center(
+            // List
+            Container(
+              decoration: BoxDecoration(
+                color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.black.withOpacity(0.05)),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+              ),
+              child: filteredTransactions.isEmpty
+                  ? const Padding(
+                      padding: EdgeInsets.all(48.0),
+                      child: Center(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.receipt_long, size: 48, color: Colors.grey),
                             SizedBox(height: 12),
                             Text('Belum ada riwayat transaksi', style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
                         ),
-                      )
-                    : ListView.separated(
-                        itemCount: filteredTransactions.length,
-                        separatorBuilder: (context, index) => const Divider(height: 1),
-                        itemBuilder: (context, index) {
-                          final tx = filteredTransactions[index];
-                          final isRefunded = tx.status == 'Refund';
+                      ),
+                    )
+                  : ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: filteredTransactions.length,
+                      separatorBuilder: (context, index) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final tx = filteredTransactions[index];
+                        final isRefunded = tx.status == 'Refund';
 
-                          return ListTile(
-                            onTap: () => _showTransactionDetail(context, tx, provider),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                            title: Row(
+                        return InkWell(
+                          onTap: () => _showTransactionDetail(context, tx, provider),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            child: Row(
                               children: [
-                                Text(tx.invoiceNumber, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF0D47A1), decoration: isRefunded ? TextDecoration.lineThrough : null)),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: isRefunded ? Colors.red.shade50 : Colors.blue.shade50,
-                                    borderRadius: BorderRadius.circular(10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(tx.invoiceNumber, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF0D47A1), decoration: isRefunded ? TextDecoration.lineThrough : null)),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: isRefunded ? const Color(0xFFFFDAD6) : const Color(0xFFE3F2FD),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: Text(tx.status, style: TextStyle(color: isRefunded ? const Color(0xFF93000A) : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 9)),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text('${tx.timeString} • ${tx.items.length} item (${tx.paymentMethod}) • Kasir: ${tx.cashierName}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                    ],
                                   ),
-                                  child: Text(tx.status, style: TextStyle(color: isRefunded ? Colors.red : Colors.blue, fontWeight: FontWeight.bold, fontSize: 9)),
                                 ),
-                              ],
-                            ),
-                            subtitle: Text('${tx.timeString} • ${tx.items.length} item (${tx.paymentMethod})', style: const TextStyle(fontSize: 11)),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
                                 Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(currencyFormatter.format(tx.total), style: TextStyle(fontWeight: FontWeight.bold, color: isRefunded ? Colors.grey : Colors.black87)),
-                                    const Text('Klik detail', style: TextStyle(fontSize: 9, color: Colors.grey)),
+                                    Text(currencyFormatter.format(tx.total), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isRefunded ? Colors.grey : Colors.black87)),
+                                    const Row(
+                                      children: [
+                                        Text('Klik detail', style: TextStyle(fontSize: 9, color: Colors.grey)),
+                                        Icon(Icons.chevron_right, size: 14, color: Colors.grey),
+                                      ],
+                                    ),
                                   ],
                                 ),
-                                const SizedBox(width: 8),
-                                const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
                               ],
                             ),
-                          );
-                        },
-                      ),
-              ),
+                          ),
+                        );
+                      },
+                    ),
             ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -147,81 +174,101 @@ class _HistoryScreenState extends State<HistoryScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         child: Container(
           width: double.infinity,
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Detail Faktur', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                  IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
-                ],
-              ),
-              const Divider(),
-              const SizedBox(height: 12),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(tx.invoiceNumber, style: const TextStyle(fontWeight: FontWeight.bold)), Text(tx.status, style: const TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.bold))]),
-              const SizedBox(height: 4),
-              Text('Kasir: ${tx.cashierName}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-              Text('Waktu: ${tx.timeString} | Pembayaran: ${tx.paymentMethod}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-              const SizedBox(height: 16),
-              const Text('Rincian Item:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-              const SizedBox(height: 8),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: tx.items.length,
-                  itemBuilder: (context, i) {
-                    final item = tx.items[i];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('${item.quantity}x ${item.product.name}', style: const TextStyle(fontSize: 12)),
-                          Text(currencyFormatter.format(item.subtotal), style: const TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const Divider(height: 32, thickness: 1, color: Colors.grey),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Total Bayar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text(currencyFormatter.format(tx.total), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0D47A1))),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                      onPressed: () {},
-                      child: const Text('Cetak Struk', style: TextStyle(fontSize: 12)),
-                    ),
-                  ),
-                  if (tx.status == 'Lunas') ...[
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                        onPressed: () {
-                          provider.toggleRefund(tx.id);
-                          Navigator.pop(ctx);
-                        },
-                        child: const Text('Refund', style: TextStyle(fontSize: 12)),
-                      ),
-                    ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Detail Faktur', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                    IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
                   ],
-                ],
-              )
-            ],
+                ),
+                const Divider(),
+                const SizedBox(height: 16),
+
+                // Paper Receipt Simulation (Matching React layout)
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+                  ),
+                  child: Column(
+                    children: [
+                      Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black)),
+                      Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 8, color: Colors.grey), textAlign: TextAlign.center),
+                      const Divider(height: 24, thickness: 1, color: Colors.black12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('No: ${tx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 9)), Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))]),
+                            Text('Kasir: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9)),
+                            Text('Waktu: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9)),
+                            Text('Metode: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9)),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 24, thickness: 1, color: Colors.black12),
+                      ...tx.items.map((item) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: Text('${item.quantity}x ${item.product.name}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black))),
+                            Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                          ],
+                        ),
+                      )),
+                      const Divider(height: 24, thickness: 1, color: Colors.black12),
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black)), Text(currencyFormatter.format(tx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black))]),
+                      if (tx.paymentMethod == 'Tunai') ...[
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TUNAI', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.paymentAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('KEMBALI', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                      ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mencetak struk...')));
+                        },
+                        icon: const Icon(Icons.print, size: 16),
+                        label: const Text('Cetak Struk', style: TextStyle(fontSize: 12)),
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
+                      ),
+                    ),
+                    if (tx.status == 'Lunas') ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            provider.toggleRefund(tx.id);
+                            Navigator.pop(ctx);
+                          },
+                          icon: const Icon(Icons.assignment_return, size: 16),
+                          label: const Text('Refund', style: TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
+                        ),
+                      ),
+                    ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

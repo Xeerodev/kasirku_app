@@ -71,14 +71,26 @@ class PosProvider with ChangeNotifier {
     address: 'Jl. Sudirman No. 123, Jakarta Selatan',
     phone: '0812-3456-7890',
     cashierName: 'Ahmad (Kasir 1)',
+    logoUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
   );
   bool _isDarkMode = false;
+
+  // Settings matching React
+  String _activePrinter = 'Epson TM-T82X (USB)';
+  bool _autoPrintReceipt = true;
+  String _footerMessage = 'Terima kasih atas kunjungan Anda!\nBarang yang sudah dibeli tidak dapat ditukar.';
+  String _language = 'Indonesia';
 
   List<Product> get products => _products;
   List<CartItem> get cart => _cart;
   List<TransactionModel> get transactions => _transactions;
   StoreProfile get storeProfile => _storeProfile;
   bool get isDarkMode => _isDarkMode;
+
+  String get activePrinter => _activePrinter;
+  bool get autoPrintReceipt => _autoPrintReceipt;
+  String get footerMessage => _footerMessage;
+  String get language => _language;
 
   List<String> get existingCategories {
     final categories = _products.map((p) => p.category).toSet().toList();
@@ -93,7 +105,7 @@ class PosProvider with ChangeNotifier {
   double get cartSubtotal =>
       _cart.fold(0, (sum, item) => sum + item.subtotal);
 
-  double get cartTax => 0.0; // React INITIAL_TRANSACTIONS has 0 tax
+  double get cartTax => 0.0;
 
   double get cartTotal => cartSubtotal + cartTax;
 
@@ -106,6 +118,21 @@ class PosProvider with ChangeNotifier {
 
   void toggleDarkMode() {
     _isDarkMode = !_isDarkMode;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void updatePrinterSettings({String? printer, bool? autoPrint, String? footer}) {
+    if (printer != null) _activePrinter = printer;
+    if (autoPrint != null) _autoPrintReceipt = autoPrint;
+    if (footer != null) _footerMessage = footer;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void updateSystemSettings({String? lang, bool? dark}) {
+    if (lang != null) _language = lang;
+    if (dark != null) _isDarkMode = dark;
     _saveToPrefs();
     notifyListeners();
   }
@@ -247,11 +274,19 @@ class PosProvider with ChangeNotifier {
     prefs.setString('storeProfile', jsonEncode(_storeProfile.toJson()));
     prefs.setString('products', jsonEncode(_products.map((p) => p.toJson()).toList()));
     prefs.setString('transactions', jsonEncode(_transactions.map((t) => t.toJson()).toList()));
+    prefs.setString('activePrinter', _activePrinter);
+    prefs.setBool('autoPrintReceipt', _autoPrintReceipt);
+    prefs.setString('footerMessage', _footerMessage);
+    prefs.setString('language', _language);
   }
 
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    _activePrinter = prefs.getString('activePrinter') ?? 'Epson TM-T82X (USB)';
+    _autoPrintReceipt = prefs.getBool('autoPrintReceipt') ?? true;
+    _footerMessage = prefs.getString('footerMessage') ?? 'Terima kasih atas kunjungan Anda!\nBarang yang sudah dibeli tidak dapat ditukar.';
+    _language = prefs.getString('language') ?? 'Indonesia';
 
     final storeStr = prefs.getString('storeProfile');
     if (storeStr != null) {

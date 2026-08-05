@@ -22,12 +22,6 @@ class ReportsScreen extends StatelessWidget {
       (sum, trx) => sum + trx.total,
     );
 
-    final totalItemsSold = activeTransactions.fold(
-      0,
-      (sum, trx) =>
-          sum + trx.items.fold(0, (iSum, item) => iSum + item.quantity),
-    );
-
     final recentTransactions = provider.transactions.take(5).toList();
 
     return Scaffold(
@@ -40,11 +34,15 @@ class ReportsScreen extends StatelessWidget {
             if (provider.storeProfile.logoUrl.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
-                child: Image.network(provider.storeProfile.logoUrl, height: 24),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)),
+                ),
               ),
             Text(
               provider.storeProfile.name,
-              style: const TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 18),
             ),
           ],
         ),
@@ -54,19 +52,37 @@ class ReportsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Laporan',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1)),
-            ),
-            const Text(
-              'Ringkasan Penjualan Hari Ini',
-              style: TextStyle(fontSize: 14, color: Color(0xFF45464D)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Laporan',
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
+                    ),
+                    const Text(
+                      'Ringkasan Penjualan Hari Ini',
+                      style: TextStyle(fontSize: 14, color: Color(0xFF45464D)),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _buildIconButton(Icons.picture_as_pdf, 'PDF', () {}),
+                    const SizedBox(width: 8),
+                    _buildIconButton(Icons.table_chart, 'Excel', () {}),
+                  ],
+                ),
+              ],
             ),
             const SizedBox(height: 24),
 
             // Bento Grid
             GridView.count(
-              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 1,
+              crossAxisCount: MediaQuery.of(context).size.width > 900 ? 3 : (MediaQuery.of(context).size.width > 600 ? 2 : 1),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               childAspectRatio: 1.8,
@@ -142,6 +158,28 @@ class ReportsScreen extends StatelessWidget {
                       },
                     ),
             ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconButton(IconData icon, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF0D47A1)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: const Color(0xFF0D47A1)),
+            const SizedBox(width: 6),
+            Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
           ],
         ),
       ),
@@ -155,6 +193,7 @@ class ReportsScreen extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.blue.withOpacity(0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,13 +221,13 @@ class ReportsScreen extends StatelessWidget {
   }
 
   Widget _buildTopProductCard(PosProvider provider, NumberFormat currencyFormatter) {
-    // Dummy top product based on React's hardcoded one for UI matching
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.black.withOpacity(0.05)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +244,7 @@ class ReportsScreen extends StatelessWidget {
           const Spacer(),
           Row(
             children: [
-              Container(width: 40, height: 40, decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.image, color: Colors.grey, size: 20)),
+              Container(width: 40, height: 40, decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.image, color: Colors.grey, size: 20)),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

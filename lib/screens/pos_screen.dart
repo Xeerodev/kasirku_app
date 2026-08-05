@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/pos_provider.dart';
 import '../models/product.dart';
 import '../models/transaction.dart';
@@ -66,7 +69,7 @@ class _PosScreenState extends State<PosScreen> {
                         Text(
                           'Kasir',
                           style: TextStyle(
-                            color: provider.isDarkMode ? const Color(0xFF64B5F6) : const Color(0xFF0D47A1),
+                            color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
                             fontWeight: FontWeight.bold,
                             fontSize: 24,
                             letterSpacing: -0.5,
@@ -345,7 +348,7 @@ class _PosScreenState extends State<PosScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        height: MediaQuery.of(context).size.height * 0.8,
+        height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
           color: provider.isDarkMode ? const Color(0xFF0B1C30) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
@@ -438,6 +441,7 @@ class _PosScreenState extends State<PosScreen> {
     String paymentMethod = 'Tunai';
     double cashAmount = provider.cartTotal;
     final cashController = TextEditingController(text: cashAmount.toInt().toString());
+    String? proofPhotoBase64;
 
     showDialog(
       context: context,
@@ -458,7 +462,7 @@ class _PosScreenState extends State<PosScreen> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: Container(
               width: double.infinity,
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 450),
               padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -466,97 +470,148 @@ class _PosScreenState extends State<PosScreen> {
                    Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Pembayaran', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Pembayaran', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const Text('Pilih metode pembayaran transaksi', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                        ],
+                      ),
                       IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
                     ],
                   ),
                   const Divider(),
-                  const SizedBox(height: 16),
-
-                  // Total Bill Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.3))),
-                    child: Column(
-                      children: [
-                        const Text('Total Tagihan', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                        Text(currencyFormatter.format(provider.cartTotal), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Method Selection
-                  const Align(alignment: Alignment.centerLeft, child: Text('Metode Pembayaran', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      _buildMethodBtn('Tunai', Icons.payments, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
-                      const SizedBox(width: 8),
-                      _buildMethodBtn('QRIS', Icons.qr_code_scanner, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
-                      const SizedBox(width: 8),
-                      _buildMethodBtn('Kartu', Icons.credit_card, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
 
-                  if (paymentMethod == 'Tunai') ...[
-                    TextField(
-                      controller: cashController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Uang Diterima', prefixText: 'Rp ', border: OutlineInputBorder()),
-                      onChanged: (v) => setDialogState(() => cashAmount = double.tryParse(v) ?? 0),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      children: quickMoneyOptions.map((opt) => ActionChip(
-                        label: Text(currencyFormatter.format(opt), style: const TextStyle(fontSize: 10)),
-                        onPressed: () {
-                          setDialogState(() {
-                            cashAmount = opt.toDouble();
-                            cashController.text = opt.toInt().toString();
-                          });
-                        },
-                      )).toList(),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Kembalian'),
-                        Text(currencyFormatter.format(change), style: TextStyle(fontWeight: FontWeight.bold, color: cashAmount >= provider.cartTotal ? Colors.green : Colors.red)),
-                      ],
-                    ),
-                  ],
-
-                  if (paymentMethod == 'QRIS') ...[
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12)),
+                  Flexible(
+                    child: SingleChildScrollView(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Image.network('https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=KASIRKU-${provider.cartTotal}', height: 120),
                           const SizedBox(height: 8),
-                          const Text('Scan QRIS Kasirku', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                          // Total Bill Card
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.3))),
+                            child: Column(
+                              children: [
+                                const Text('Total Tagihan (Tanpa Pajak)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                                Text(currencyFormatter.format(provider.cartTotal), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Method Selection
+                          const Align(alignment: Alignment.centerLeft, child: Text('Metode Pembayaran', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              _buildMethodBtn('Tunai', Icons.payments, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
+                              const SizedBox(width: 8),
+                              _buildMethodBtn('QRIS', Icons.qr_code_scanner, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
+                              const SizedBox(width: 8),
+                              _buildMethodBtn('Kartu', Icons.credit_card, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          if (paymentMethod == 'Tunai') ...[
+                            TextField(
+                              controller: cashController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(labelText: 'Uang Diterima', prefixText: 'Rp ', border: OutlineInputBorder()),
+                              onChanged: (v) => setDialogState(() => cashAmount = double.tryParse(v) ?? 0),
+                            ),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 8,
+                              children: quickMoneyOptions.map((opt) => ActionChip(
+                                label: Text(currencyFormatter.format(opt), style: const TextStyle(fontSize: 10)),
+                                onPressed: () {
+                                  setDialogState(() {
+                                    cashAmount = opt.toDouble();
+                                    cashController.text = opt.toInt().toString();
+                                  });
+                                },
+                              )).toList(),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Kembalian'),
+                                Text(currencyFormatter.format(change), style: TextStyle(fontWeight: FontWeight.bold, color: cashAmount >= provider.cartTotal ? Colors.green : Colors.red)),
+                              ],
+                            ),
+                          ],
+
+                          if (paymentMethod == 'QRIS') ...[
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12)),
+                              child: Column(
+                                children: [
+                                  Image.network('https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=KASIRKU-${provider.cartTotal}', height: 120),
+                                  const SizedBox(height: 8),
+                                  const Text('Scan QRIS Kasirku', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                                ],
+                              ),
+                            ),
+                          ],
+
+                          if (paymentMethod == 'Kartu') ...[
+                             Container(
+                               padding: const EdgeInsets.all(16),
+                               decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12)),
+                               child: Column(
+                                 children: [
+                                   const Icon(Icons.photo_camera, size: 48, color: Color(0xFF0D47A1)),
+                                   const SizedBox(height: 8),
+                                   const Text('Foto HP Pelanggan / Bukti Transaksi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                   const Text('Cukup foto layar HP / struk EDC pelanggan untuk verifikasi kartu debit', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                   const SizedBox(height: 12),
+                                   if (proofPhotoBase64 != null)
+                                     Stack(
+                                       children: [
+                                         ClipRRect(
+                                           borderRadius: BorderRadius.circular(8),
+                                           child: Image.memory(base64Decode(proofPhotoBase64!), height: 120, width: double.infinity, fit: BoxFit.cover),
+                                         ),
+                                         Positioned(
+                                           top: 4, right: 4,
+                                           child: GestureDetector(
+                                             onTap: () => setDialogState(() => proofPhotoBase64 = null),
+                                             child: Container(padding: const EdgeInsets.all(4), decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), child: const Icon(Icons.close, size: 14, color: Colors.white)),
+                                           ),
+                                         )
+                                       ],
+                                     )
+                                   else
+                                     ElevatedButton.icon(
+                                       onPressed: () async {
+                                         final picker = ImagePicker();
+                                         final photo = await picker.pickImage(source: ImageSource.camera);
+                                         if (photo != null) {
+                                           final bytes = await photo.readAsBytes();
+                                           setDialogState(() => proofPhotoBase64 = base64Encode(bytes));
+                                         }
+                                       },
+                                       icon: const Icon(Icons.add_a_photo, size: 16),
+                                       label: const Text('Ambil / Unggah Foto HP', style: TextStyle(fontSize: 11)),
+                                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061A4), foregroundColor: Colors.white),
+                                     ),
+                                 ],
+                               ),
+                             )
+                          ],
                         ],
                       ),
                     ),
-                  ],
+                  ),
 
-                  if (paymentMethod == 'Kartu') ...[
-                     const Column(
-                       children: [
-                         Icon(Icons.photo_camera, size: 48, color: Colors.grey),
-                         SizedBox(height: 8),
-                         Text('Verifikasi Pembayaran Kartu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                         Text('Silakan swipe kartu pada mesin EDC.', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: Colors.grey)),
-                       ],
-                     )
-                  ],
-
-                  const Spacer(),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF006C49),
@@ -568,7 +623,7 @@ class _PosScreenState extends State<PosScreen> {
                        final trx = provider.checkout(paymentAmount: cashAmount, paymentMethod: paymentMethod);
                        Navigator.pop(ctx);
                        if (trx != null) {
-                         _showSuccessReceipt(context, trx, provider);
+                         _showSuccessReceipt(context, trx, provider, cashAmount);
                        }
                     },
                     child: const Text('KONFIRMASI LUNAS', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -606,60 +661,100 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  void _showSuccessReceipt(BuildContext context, TransactionModel trx, PosProvider provider) {
+  void _showSuccessReceipt(BuildContext context, TransactionModel trx, PosProvider provider, double paidAmount) {
     final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
+        child: Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 400),
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle, color: Colors.green, size: 64),
+              Container(
+                width: 64, height: 64,
+                decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
+                child: const Icon(Icons.check_circle, color: Colors.green, size: 40),
+              ),
               const SizedBox(height: 12),
               const Text('Transaksi Berhasil!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               Text(trx.invoiceNumber, style: const TextStyle(fontSize: 10, color: Colors.grey)),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Paper Receipt Simulation
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
-                ),
-                child: Column(
-                  children: [
-                    Text(provider.storeProfile.name.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87)),
-                    Text(provider.storeProfile.address, style: const TextStyle(fontSize: 8, color: Colors.grey), textAlign: TextAlign.center),
-                    const Divider(height: 24, thickness: 1, color: Colors.black12),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('No: ${trx.invoiceNumber}', style: const TextStyle(fontSize: 9, color: Colors.black87)), Text(trx.timeString, style: const TextStyle(fontSize: 9, color: Colors.black87))]),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Kasir: ${trx.cashierName}', style: const TextStyle(fontSize: 9, color: Colors.black87)), Text(trx.paymentMethod, style: const TextStyle(fontSize: 9, color: Colors.black87))]),
-                    const Divider(height: 24, thickness: 1, color: Colors.black12),
-                    ...trx.items.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(child: Text('${item.quantity}x ${item.product.name}', style: const TextStyle(fontSize: 9, color: Colors.black87))),
-                          Text(currencyFormatter.format(item.subtotal), style: const TextStyle(fontSize: 9, color: Colors.black87)),
-                        ],
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Paper Receipt Simulation (Matching React layout)
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                        ),
+                        child: Column(
+                          children: [
+                            Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black)),
+                            Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
+                            Text('Telp: ${provider.storeProfile.phone}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('No: ${trx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
+                                  Text('Kasir: ${trx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
+                                  Text('Waktu: ${trx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
+                                  Text('Metode: ${trx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
+                                ],
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
+                            ),
+                            ...trx.items.map((item) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(child: Text('${item.quantity}x ${item.product.name}', style: GoogleFonts.sourceCodePro(fontSize: 10))),
+                                  Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10)),
+                                ],
+                              ),
+                            )),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
+                            ),
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12)), Text(currencyFormatter.format(trx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12))]),
+                            if (trx.paymentMethod == 'Tunai') ...[
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TUNAI', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(paidAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('KEMBALI', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(trx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
+                            ],
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
+                            ),
+                            Text(provider.footerMessage, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
+                          ],
+                        ),
                       ),
-                    )),
-                    const Divider(height: 24, thickness: 1, color: Colors.black12),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('TOTAL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black87)), Text(currencyFormatter.format(trx.total), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black87))]),
-                    if (trx.paymentMethod == 'Tunai') ...[
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('TUNAI', style: TextStyle(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(trx.paymentAmount), style: const TextStyle(fontSize: 9, color: Colors.black54))]),
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('KEMBALI', style: TextStyle(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(trx.changeAmount), style: const TextStyle(fontSize: 9, color: Colors.black54))]),
                     ],
-                  ],
+                  ),
                 ),
               ),
+
               const SizedBox(height: 24),
               Row(
                 children: [
@@ -669,15 +764,15 @@ class _PosScreenState extends State<PosScreen> {
                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mencetak struk...')));
                       },
                       icon: const Icon(Icons.print, size: 16),
-                      label: const Text('Cetak Struk'),
-                      style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      label: const Text('Cetak'),
+                      style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(ctx),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
                       child: const Text('Selesai'),
                     ),
                   ),
