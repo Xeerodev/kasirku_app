@@ -19,6 +19,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
     final isDark = provider.isDarkMode;
+    final lang = provider.language;
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
@@ -38,7 +39,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             const SizedBox(height: 20),
             Row(
               children: [
@@ -53,7 +53,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
                       ),
                       Text(
-                        provider.language == 'Indonesia' ? 'Daftar seluruh transaksi penjualan toko' : 'List of all store sales transactions',
+                        lang == 'Indonesia' ? 'Daftar seluruh transaksi penjualan toko' : 'List of all store sales transactions',
                         style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : const Color(0xFF45464D))
                       ),
                     ],
@@ -63,7 +63,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Search Bar
             Container(
               height: 52,
               decoration: BoxDecoration(
@@ -76,7 +75,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 onChanged: (val) => setState(() => _searchQuery = val),
                 style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
-                  hintText: provider.language == 'Indonesia' ? 'Cari no. faktur atau metode...' : 'Search invoice no. or method...',
+                  hintText: lang == 'Indonesia' ? 'Cari no. faktur atau metode...' : 'Search invoice no. or method...',
                   hintStyle: TextStyle(fontSize: 14, color: isDark ? Colors.white38 : Colors.grey),
                   prefixIcon: Icon(Icons.search, color: isDark ? Colors.white38 : Colors.grey),
                   border: InputBorder.none,
@@ -87,7 +86,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
             const SizedBox(height: 24),
 
-            // List
             Container(
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF12253C) : Colors.white,
@@ -104,7 +102,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             Icon(Icons.receipt_long, size: 48, color: isDark ? Colors.white10 : Colors.grey),
                             const SizedBox(height: 12),
                             Text(
-                              provider.language == 'Indonesia' ? 'Belum ada riwayat transaksi' : 'No transaction history yet',
+                              lang == 'Indonesia' ? 'Belum ada riwayat transaksi' : 'No transaction history yet',
                               style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)
                             ),
                           ],
@@ -154,7 +152,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                         ],
                                       ),
                                       const SizedBox(height: 4),
-                                      Text('${tx.timeString} • ${tx.items.length} item (${tx.paymentMethod}) • ${provider.language == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.grey)),
+                                      Text('${tx.timeString} • ${tx.items.length} item (${tx.paymentMethod}) • ${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.grey)),
                                     ],
                                   ),
                                 ),
@@ -165,7 +163,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     Text(currencyFormatter.format(tx.total), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isRefunded ? (isDark ? Colors.white10 : Colors.grey) : (isDark ? Colors.white : Colors.black87))),
                                     Row(
                                       children: [
-                                        Text(provider.language == 'Indonesia' ? 'Klik detail' : 'See detail', style: TextStyle(fontSize: 9, color: isDark ? Colors.white38 : Colors.grey)),
+                                        Text(lang == 'Indonesia' ? 'Klik detail' : 'See detail', style: TextStyle(fontSize: 9, color: isDark ? Colors.white38 : Colors.grey)),
                                         Icon(Icons.chevron_right, size: 14, color: isDark ? Colors.white38 : Colors.grey),
                                       ],
                                     ),
@@ -186,12 +184,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _showTransactionDetail(BuildContext context, TransactionModel tx, PosProvider provider) {
-    final currencyFormatter = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp ',
-      decimalDigits: 0,
-    );
+    final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     final isDark = provider.isDarkMode;
+    final lang = provider.language;
 
     showDialog(
       context: context,
@@ -226,7 +221,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Paper Receipt Simulation
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
@@ -253,9 +247,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                       Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))
                                     ]
                                   ),
-                                  Text('${provider.language == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
-                                  Text('${provider.language == 'Indonesia' ? 'Waktu' : 'Time'}: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
-                                  Text('${provider.language == 'Indonesia' ? 'Metode' : 'Method'}: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                                  Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                                  Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                                  Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
                                 ],
                               ),
                             ),
@@ -279,8 +273,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             const Divider(height: 24, thickness: 1, color: Colors.black12),
                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black)), Text(currencyFormatter.format(tx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.black))]),
                             if (tx.paymentMethod == 'Tunai' || tx.paymentMethod == 'Cash') ...[
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(provider.language == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.paymentAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(provider.language == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.paymentAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)), Text(currencyFormatter.format(tx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54))]),
                             ],
                           ],
                         ),
@@ -296,7 +290,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(provider.language == 'Indonesia' ? 'Mencetak struk...' : 'Printing receipt...'), behavior: SnackBarBehavior.floating));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Mencetak struk...' : 'Printing receipt...'), behavior: SnackBarBehavior.floating));
                       },
                       icon: const Icon(Icons.print, size: 16),
                       label: Text(provider.tr('print'), style: const TextStyle(fontSize: 12)),

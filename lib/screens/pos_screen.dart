@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/pos_provider.dart';
 import '../models/product.dart';
 import '../models/transaction.dart';
+import '../services/printer_service.dart';
 
 class PosScreen extends StatefulWidget {
   const PosScreen({super.key});
@@ -18,6 +19,7 @@ class PosScreen extends StatefulWidget {
 class _PosScreenState extends State<PosScreen> {
   String _selectedCategory = 'Semua';
   String _searchQuery = '';
+  final PrinterService _printerService = PrinterService();
 
   final List<String> _categories = [
     'Semua',
@@ -31,6 +33,7 @@ class _PosScreenState extends State<PosScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
+    // ALWAYS IDR as requested
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
@@ -163,7 +166,7 @@ class _PosScreenState extends State<PosScreen> {
                     padding: const EdgeInsets.all(16),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
-                      childAspectRatio: width > 600 ? 0.75 : 0.65, // More dynamic ratio
+                      childAspectRatio: width > 600 ? 0.75 : 0.65,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),

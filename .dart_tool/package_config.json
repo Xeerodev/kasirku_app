@@ -2,6 +2,12 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "archive",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/archive-3.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "args",
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/args-2.7.0",
       "packageUri": "lib/",
@@ -12,6 +18,24 @@
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.13.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "barcode",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/barcode-2.2.9",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "bidi",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/bidi-2.0.13",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "blue_thermal_printer",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/blue_thermal_printer-1.2.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "boolean_selector",
@@ -62,6 +86,18 @@
       "languageVersion": "3.9"
     },
     {
+      "name": "equatable",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/equatable-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "excel",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/excel-4.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "fake_async",
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/fake_async-1.3.3",
       "packageUri": "lib/",
@@ -102,6 +138,12 @@
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/file_selector_windows-0.9.3+5",
       "packageUri": "lib/",
       "languageVersion": "3.8"
+    },
+    {
+      "name": "fixnum",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/fixnum-1.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "flutter",
@@ -156,6 +198,12 @@
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/http_parser-4.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "image",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
     },
     {
       "name": "image_picker",
@@ -279,7 +327,7 @@
     },
     {
       "name": "mime",
-      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/mime-2.0.0",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/mime-1.0.6",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -306,6 +354,12 @@
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/path-1.9.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "path_parsing",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/path_parsing-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "path_provider",
@@ -344,6 +398,54 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "pdf",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/pdf-3.12.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "permission_handler",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-11.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "permission_handler_android",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-12.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "permission_handler_apple",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_apple-9.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "permission_handler_html",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_html-0.1.4+1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "permission_handler_platform_interface",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_platform_interface-4.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "permission_handler_windows",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_windows-0.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "petitparser",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/petitparser-7.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
       "name": "platform",
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/platform-3.1.6",
       "packageUri": "lib/",
@@ -368,10 +470,28 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "qr",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/qr-3.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "record_use",
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/record_use-0.6.0",
       "packageUri": "lib/",
       "languageVersion": "3.10"
+    },
+    {
+      "name": "share_plus",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/share_plus-7.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "share_plus_platform_interface",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/share_plus_platform_interface-3.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
     },
     {
       "name": "shared_preferences",
@@ -512,6 +632,12 @@
       "languageVersion": "3.8"
     },
     {
+      "name": "uuid",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/uuid-4.6.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "vector_math",
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/vector_math-2.2.0",
       "packageUri": "lib/",
@@ -530,10 +656,22 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "win32",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.15.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
+    },
+    {
       "name": "xdg_directories",
       "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "xml",
+      "rootUri": "file:///C:/Users/Zen/AppData/Local/Pub/Cache/hosted/pub.dev/xml-6.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.8"
     },
     {
       "name": "yaml",

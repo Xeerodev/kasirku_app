@@ -3,9 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/pos_provider.dart';
+import '../services/export_service.dart';
 
-class ReportsScreen extends StatelessWidget {
+class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
+
+  @override
+  State<ReportsScreen> createState() => _ReportsScreenState();
+}
+
+class _ReportsScreenState extends State<ReportsScreen> {
+  bool _isExporting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -82,50 +90,50 @@ class ReportsScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildIconButton(Icons.picture_as_pdf, 'PDF', () => _simulateExport(context, 'PDF', provider), isDark),
-                    const SizedBox(width: 8),
-                    _buildIconButton(Icons.table_chart, 'Excel', () => _simulateExport(context, 'Excel', provider), isDark),
-                  ],
-                ),
+                if (_isExporting)
+                  const CircularProgressIndicator()
+                else
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildIconButton(Icons.picture_as_pdf, 'PDF', () => _handlePdfExport(provider), isDark),
+                      const SizedBox(width: 8),
+                      _buildIconButton(Icons.table_chart, 'Excel', () => _handleExcelExport(provider), isDark),
+                    ],
+                  ),
               ],
             ),
             const SizedBox(height: 24),
 
-            // Bento Grid - More Responsive
-            LayoutBuilder(builder: (context, constraints) {
-              return GridView.count(
-                crossAxisCount: width > 900 ? 3 : (width > 600 ? 2 : 1),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: width > 600 ? 1.8 : 2.5,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _buildBentoCard(
-                    title: provider.tr('total_revenue'),
-                    value: currencyFormatter.format(totalRevenue),
-                    subtitle: provider.language == 'Indonesia' ? '+14.2% dari kemarin' : '+14.2% from yesterday',
-                    icon: Icons.payments,
-                    color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
-                    textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
-                    isDark: isDark,
-                  ),
-                  _buildBentoCard(
-                    title: provider.tr('total_transactions'),
-                    value: '${activeTransactions.length} ${provider.language == 'Indonesia' ? 'Transaksi' : 'Transactions'}',
-                    subtitle: '${provider.language == 'Indonesia' ? 'Rata-rata' : 'Average'} ${currencyFormatter.format(activeTransactions.isEmpty ? 0 : totalRevenue / activeTransactions.length)} / trx',
-                    icon: Icons.receipt_long,
-                    color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
-                    textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
-                    isDark: isDark,
-                  ),
-                  _buildTopProductCard(provider, currencyFormatter),
-                ],
-              );
-            }),
+            GridView.count(
+              crossAxisCount: width > 900 ? 3 : (width > 600 ? 2 : 1),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              childAspectRatio: width > 600 ? 1.8 : 2.5,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              children: [
+                _buildBentoCard(
+                  title: provider.tr('total_revenue'),
+                  value: currencyFormatter.format(totalRevenue),
+                  subtitle: provider.language == 'Indonesia' ? '+14.2% dari kemarin' : '+14.2% from yesterday',
+                  icon: Icons.payments,
+                  color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
+                  textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
+                  isDark: isDark,
+                ),
+                _buildBentoCard(
+                  title: provider.tr('total_transactions'),
+                  value: '${activeTransactions.length} ${provider.language == 'Indonesia' ? 'Transaksi' : 'Transactions'}',
+                  subtitle: '${provider.language == 'Indonesia' ? 'Rata-rata' : 'Average'} ${currencyFormatter.format(activeTransactions.isEmpty ? 0 : totalRevenue / activeTransactions.length)} / trx',
+                  icon: Icons.receipt_long,
+                  color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD),
+                  textColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
+                  isDark: isDark,
+                ),
+                _buildTopProductCard(provider, currencyFormatter),
+              ],
+            ),
 
             const SizedBox(height: 32),
             Row(
@@ -146,7 +154,6 @@ class ReportsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Recent Transactions Table Style
             Container(
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF12253C) : Colors.white,
@@ -183,28 +190,56 @@ class ReportsScreen extends StatelessWidget {
     );
   }
 
-  void _simulateExport(BuildContext context, String type, PosProvider provider) {
+  Future<void> _handlePdfExport(PosProvider provider) async {
+    setState(() => _isExporting = true);
+    final path = await ExportService.exportToPdf(provider.transactions, provider.storeProfile.name, provider.language);
+    setState(() => _isExporting = false);
+
+    if (mounted) {
+      if (path != null) {
+        _showSuccessDialog(context, "PDF", path, provider.language);
+      } else {
+        _showErrorDialog(context, "PDF", provider.language);
+      }
+    }
+  }
+
+  Future<void> _handleExcelExport(PosProvider provider) async {
+    setState(() => _isExporting = true);
+    final path = await ExportService.exportToExcel(provider.transactions, provider.storeProfile.name, provider.language);
+    setState(() => _isExporting = false);
+
+    if (mounted) {
+      if (path != null) {
+        _showSuccessDialog(context, "Excel", path, provider.language);
+      } else {
+        _showErrorDialog(context, "Excel", provider.language);
+      }
+    }
+  }
+
+  void _showSuccessDialog(BuildContext context, String type, String path, String lang) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Icon(type == 'PDF' ? Icons.picture_as_pdf : Icons.table_chart, color: const Color(0xFF0D47A1)),
-            const SizedBox(width: 12),
-            Text('Export $type', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
-          ],
-        ),
-        content: Text(
-          provider.language == 'Indonesia'
-            ? 'Laporan berhasil diekspor ke format $type. File tersimpan di folder Unduhan.'
-            : 'Report successfully exported to $type format. File saved in Downloads folder.',
-          style: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.black54),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
-        ],
+        title: Text(lang == 'Indonesia' ? "Berhasil Simpan $type" : "$type Export Success"),
+        content: Text(lang == 'Indonesia'
+          ? "File berhasil disimpan di:\n$path\n\nAnda dapat membukanya di folder Documents/Kasirku"
+          : "File successfully saved at:\n$path\n\nYou can open it in Documents/Kasirku folder"),
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("OK"))],
+      ),
+    );
+  }
+
+  void _showErrorDialog(BuildContext context, String type, String lang) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(lang == 'Indonesia' ? "Gagal Simpan $type" : "$type Export Failed"),
+        content: Text(lang == 'Indonesia'
+          ? "Terjadi kesalahan atau izin akses ditolak."
+          : "An error occurred or permission was denied."),
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("OK"))],
       ),
     );
   }
@@ -289,7 +324,7 @@ class ReportsScreen extends StatelessWidget {
           const Spacer(),
           Row(
             children: [
-              Container(width: 40, height: 40, decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(10)), child: Icon(Icons.image, color: isDark ? Colors.white24 : Colors.grey, size: 20)),
+              Container(width: 40, height: 40, decoration: BoxDecoration(color: isDark ? Colors.white10 : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(10)), child: Icon(Icons.image, color: isDark ? Colors.white24 : Colors.grey, size: 20)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
