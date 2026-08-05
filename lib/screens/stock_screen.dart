@@ -21,8 +21,8 @@ class _StockScreenState extends State<StockScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
     final currencyFormatter = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp ',
+      locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
+      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
       decimalDigits: 0,
     );
 
@@ -45,7 +45,7 @@ class _StockScreenState extends State<StockScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Manajemen Stok',
+                  provider.tr('stock'),
                   style: TextStyle(
                     color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1),
                     fontWeight: FontWeight.bold,
@@ -53,7 +53,7 @@ class _StockScreenState extends State<StockScreen> {
                   ),
                 ),
                 Text(
-                  'Kelola ketersediaan produk dan harga barang',
+                  provider.language == 'Indonesia' ? 'Kelola ketersediaan produk dan harga barang' : 'Manage product availability and item prices',
                   style: TextStyle(color: provider.isDarkMode ? Colors.white54 : const Color(0xFF45464D), fontSize: 12),
                 ),
                 const SizedBox(height: 20),
@@ -70,7 +70,7 @@ class _StockScreenState extends State<StockScreen> {
                     onChanged: (val) => setState(() => _searchQuery = val),
                     style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
                     decoration: InputDecoration(
-                      hintText: 'Cari Produk...',
+                      hintText: provider.tr('search_product'),
                       hintStyle: TextStyle(color: provider.isDarkMode ? Colors.white38 : Colors.grey, fontSize: 14),
                       prefixIcon: Icon(Icons.search, color: provider.isDarkMode ? Colors.white38 : const Color(0xFF76777D)),
                       suffixIcon: _searchQuery.isNotEmpty
@@ -139,9 +139,9 @@ class _StockScreenState extends State<StockScreen> {
           children: [
             const Icon(Icons.inventory_2, size: 48, color: Color(0xFF2196F3)),
             const SizedBox(height: 12),
-            Text('Belum Ada Produk dalam Stok', style: TextStyle(fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white : Colors.black87)),
+            Text(provider.language == 'Indonesia' ? 'Belum Ada Produk dalam Stok' : 'No Products in Stock Yet', style: TextStyle(fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white : Colors.black87)),
             const SizedBox(height: 4),
-            Text('Klik tombol \'+\' di bawah untuk menambahkan produk baru.', textAlign: TextAlign.center, style: TextStyle(color: provider.isDarkMode ? Colors.white54 : Colors.grey, fontSize: 11)),
+            Text(provider.language == 'Indonesia' ? 'Klik tombol \'+\' di bawah untuk menambahkan produk baru.' : 'Click the \'+\' button below to add a new product.', textAlign: TextAlign.center, style: TextStyle(color: provider.isDarkMode ? Colors.white54 : Colors.grey, fontSize: 11)),
           ],
         ),
       ),
@@ -199,11 +199,11 @@ class _StockScreenState extends State<StockScreen> {
                 Text(product.category, style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.grey)),
                 const SizedBox(height: 12),
                 if (isOutOfStock)
-                  const Row(children: [Icon(Icons.block, size: 14, color: Color(0xFFBA1A1A)), SizedBox(width: 4), Text('Habis', style: TextStyle(color: Color(0xFFBA1A1A), fontWeight: FontWeight.bold, fontSize: 11))])
+                  Row(children: [const Icon(Icons.block, size: 14, color: Color(0xFFBA1A1A)), const SizedBox(width: 4), Text(provider.tr('out_of_stock'), style: const TextStyle(color: Color(0xFFBA1A1A), fontWeight: FontWeight.bold, fontSize: 11))])
                 else if (isLowStock)
-                  Row(children: [const Icon(Icons.warning, size: 14, color: Color(0xFFEA580C)), const SizedBox(width: 4), Text('Sisa ${product.stock}', style: const TextStyle(color: Color(0xFFEA580C), fontWeight: FontWeight.bold, fontSize: 11))])
+                  Row(children: [const Icon(Icons.warning, size: 14, color: Color(0xFFEA580C)), const SizedBox(width: 4), Text('${provider.tr('low_stock')} ${product.stock}', style: const TextStyle(color: Color(0xFFEA580C), fontWeight: FontWeight.bold, fontSize: 11))])
                 else
-                  Text('Stok: ${product.stock}', style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontSize: 11)),
+                  Text('${provider.language == 'Indonesia' ? 'Stok' : 'Stock'}: ${product.stock}', style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontSize: 11)),
                 Text(formatter.format(product.price), style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ),
@@ -225,6 +225,7 @@ class _StockScreenState extends State<StockScreen> {
   }
 
   void _showDeleteConfirm(BuildContext context, Product product, PosProvider provider) {
+    final lang = provider.language;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -235,19 +236,19 @@ class _StockScreenState extends State<StockScreen> {
           children: [
             Container(width: 48, height: 48, decoration: const BoxDecoration(color: Color(0xFFFFDAD6), shape: BoxShape.circle), child: const Icon(Icons.delete, color: Color(0xFFBA1A1A))),
             const SizedBox(height: 16),
-            Text('Hapus Produk?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: provider.isDarkMode ? Colors.white : Colors.black87)),
+            Text(provider.tr('delete_product'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: provider.isDarkMode ? Colors.white : Colors.black87)),
             const SizedBox(height: 8),
-            Text('Apakah Anda yakin ingin menghapus "${product.name}"?', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: provider.isDarkMode ? Colors.white54 : Colors.grey)),
+            Text('${provider.tr('confirm_delete')} "${product.name}"?', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: provider.isDarkMode ? Colors.white54 : Colors.grey)),
             const SizedBox(height: 24),
             Row(
               children: [
-                Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Batal'))),
+                Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(provider.tr('cancel')))),
                 const SizedBox(width: 12),
                 Expanded(child: ElevatedButton(onPressed: () {
                   provider.deleteProduct(product.id);
                   Navigator.pop(ctx);
-                  _showFloatingPopup(context, 'Produk berhasil dihapus!', isError: true);
-                }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Hapus'))),
+                  _showFloatingPopup(context, lang == 'Indonesia' ? 'Produk berhasil dihapus!' : 'Product deleted successfully!', isError: true);
+                }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(lang == 'Indonesia' ? 'Hapus' : 'Delete'))),
               ],
             ),
           ],
@@ -264,6 +265,7 @@ class _StockScreenState extends State<StockScreen> {
     String selectedCat = productToEdit?.category ?? 'Kopi';
     bool isCustom = !provider.existingCategories.contains(selectedCat);
     String imageBase64 = productToEdit?.image ?? '';
+    final lang = provider.language;
 
     showDialog(
       context: context,
@@ -285,29 +287,29 @@ class _StockScreenState extends State<StockScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(productToEdit == null ? 'Tambah Produk Baru' : 'Edit Produk', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
+                        Text(productToEdit == null ? provider.tr('add_product') : provider.tr('edit_product'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
                         IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: provider.isDarkMode ? Colors.white54 : Colors.black54)),
                       ],
                     ),
                     const Divider(),
                     const SizedBox(height: 16),
 
-                    _buildLabel('Nama Produk', provider.isDarkMode),
+                    _buildLabel(provider.tr('product_name'), provider.isDarkMode),
                     TextFormField(
                       controller: nameCtrl,
                       style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
-                      decoration: _inputDeco('cth. Latte Special'),
-                      validator: (v) => v!.isEmpty ? 'Nama produk wajib diisi' : null,
+                      decoration: _inputDeco(lang == 'Indonesia' ? 'cth. Latte Special' : 'e.g. Special Latte'),
+                      validator: (v) => v!.isEmpty ? (lang == 'Indonesia' ? 'Nama produk wajib diisi' : 'Product name is required') : null,
                     ),
                     const SizedBox(height: 16),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildLabel('Kategori', provider.isDarkMode),
+                        _buildLabel(provider.tr('category'), provider.isDarkMode),
                         TextButton(
                           onPressed: () => setDialogState(() => isCustom = !isCustom),
-                          child: Text(isCustom ? 'Pilih dari Daftar' : '+ Ketik Manual', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          child: Text(isCustom ? (lang == 'Indonesia' ? 'Pilih dari Daftar' : 'Choose from List') : (lang == 'Indonesia' ? '+ Ketik Manual' : '+ Type Manual'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -324,8 +326,8 @@ class _StockScreenState extends State<StockScreen> {
                       TextFormField(
                         onChanged: (v) => selectedCat = v,
                         style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
-                        decoration: _inputDeco('Tulis nama kategori baru...'),
-                        validator: (v) => v!.isEmpty ? 'Kategori wajib diisi' : null,
+                        decoration: _inputDeco(lang == 'Indonesia' ? 'Tulis nama kategori baru...' : 'Type new category name...'),
+                        validator: (v) => v!.isEmpty ? (lang == 'Indonesia' ? 'Kategori wajib diisi' : 'Category is required') : null,
                       ),
 
                     const SizedBox(height: 16),
@@ -335,13 +337,13 @@ class _StockScreenState extends State<StockScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel('Harga (Rp)', provider.isDarkMode),
+                              _buildLabel(provider.tr('price'), provider.isDarkMode),
                               TextFormField(
                                 controller: priceCtrl,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
                                 decoration: _inputDeco('25000'),
-                                validator: (v) => v!.isEmpty ? 'Harga wajib diisi' : null,
+                                validator: (v) => v!.isEmpty ? (lang == 'Indonesia' ? 'Harga wajib diisi' : 'Price is required') : null,
                               )
                             ]
                           )
@@ -351,13 +353,13 @@ class _StockScreenState extends State<StockScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel('Jumlah Stok', provider.isDarkMode),
+                              _buildLabel(provider.tr('stock_amount'), provider.isDarkMode),
                               TextFormField(
                                 controller: stockCtrl,
                                 keyboardType: TextInputType.number,
                                 style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
                                 decoration: _inputDeco('50'),
-                                validator: (v) => v!.isEmpty ? 'Stok wajib diisi' : null,
+                                validator: (v) => v!.isEmpty ? (lang == 'Indonesia' ? 'Stok wajib diisi' : 'Stock is required') : null,
                               )
                             ]
                           )
@@ -366,7 +368,7 @@ class _StockScreenState extends State<StockScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    _buildLabel('Gambar Produk', provider.isDarkMode),
+                    _buildLabel(provider.language == 'Indonesia' ? 'Gambar Produk' : 'Product Image', provider.isDarkMode),
                     if (imageBase64.isNotEmpty)
                       Stack(
                         children: [
@@ -409,7 +411,7 @@ class _StockScreenState extends State<StockScreen> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), minimumSize: Size.zero),
-                              child: const Text('Ganti', style: TextStyle(fontSize: 10)),
+                              child: Text(lang == 'Indonesia' ? 'Ganti' : 'Change', style: const TextStyle(fontSize: 10)),
                             ),
                           )
                         ],
@@ -442,7 +444,7 @@ class _StockScreenState extends State<StockScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(Icons.cloud_upload, color: Color(0xFF0D47A1), size: 32),
-                              Text('Upload Gambar dari Galeri', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white70 : Colors.black87)),
+                              Text(lang == 'Indonesia' ? 'Upload Gambar dari Galeri' : 'Upload Image from Gallery', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white70 : Colors.black87)),
                               Text('JPG, PNG, WEBP (Auto-Compressed)', style: TextStyle(fontSize: 9, color: provider.isDarkMode ? Colors.white38 : Colors.grey.shade400)),
                             ],
                           ),
@@ -450,13 +452,13 @@ class _StockScreenState extends State<StockScreen> {
                       ),
 
                     const SizedBox(height: 16),
-                    _buildLabel('Deskripsi Produk', provider.isDarkMode),
-                    TextFormField(controller: descCtrl, maxLines: 2, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco('Deskripsi singkat produk...')),
+                    _buildLabel(provider.tr('description'), provider.isDarkMode),
+                    TextFormField(controller: descCtrl, maxLines: 2, style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87), decoration: _inputDeco(lang == 'Indonesia' ? 'Deskripsi singkat produk...' : 'Short product description...')),
 
                     const SizedBox(height: 24),
                     Row(
                       children: [
-                        Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Batal'))),
+                        Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text(provider.tr('cancel')))),
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
@@ -473,10 +475,10 @@ class _StockScreenState extends State<StockScreen> {
                                   description: descCtrl.text,
                                 ));
                                 Navigator.pop(ctx);
-                                _showFloatingPopup(context, productToEdit == null ? 'Produk berhasil ditambahkan!' : 'Perubahan produk berhasil disimpan!', isError: false);
+                                _showFloatingPopup(context, productToEdit == null ? (lang == 'Indonesia' ? 'Produk berhasil ditambahkan!' : 'Product added successfully!') : (lang == 'Indonesia' ? 'Perubahan produk berhasil disimpan!' : 'Product changes saved successfully!'), isError: false);
                               }
                             },
-                            child: const Text('Simpan Produk'),
+                            child: Text(provider.tr('save')),
                           ),
                         ),
                       ],

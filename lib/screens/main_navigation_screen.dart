@@ -26,11 +26,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   ];
 
   final List<Map<String, dynamic>> _navItems = [
-    {'id': 'pos', 'label': 'Kasir', 'icon': Icons.point_of_sale},
-    {'id': 'stok', 'label': 'Stok', 'icon': Icons.inventory_2},
-    {'id': 'riwayat', 'label': 'Riwayat', 'icon': Icons.history},
-    {'id': 'laporan', 'label': 'Laporan', 'icon': Icons.analytics},
-    {'id': 'pengaturan', 'label': 'Pengaturan', 'icon': Icons.settings},
+    {'id': 'pos', 'label': 'cashier', 'icon': Icons.point_of_sale},
+    {'id': 'stok', 'label': 'stock', 'icon': Icons.inventory_2},
+    {'id': 'riwayat', 'label': 'history', 'icon': Icons.history},
+    {'id': 'laporan', 'label': 'reports', 'icon': Icons.analytics},
+    {'id': 'pengaturan', 'label': 'settings', 'icon': Icons.settings},
   ];
 
   @override
@@ -147,7 +147,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              item['label'],
+                              provider.tr(item['label']),
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
@@ -215,7 +215,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              provider.isDarkMode ? 'Gelap' : 'Terang',
+                              provider.isDarkMode ? (provider.language == 'Indonesia' ? 'Gelap' : 'Dark') : (provider.language == 'Indonesia' ? 'Terang' : 'Light'),
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1)),
                             ),
                           ],
@@ -269,7 +269,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const Text('Kasir Aktif', style: TextStyle(fontSize: 9, color: Colors.grey)),
+                            Text(provider.language == 'Indonesia' ? 'Kasir Aktif' : 'Active Cashier', style: const TextStyle(fontSize: 9, color: Colors.grey)),
                           ],
                         ),
                       ),
@@ -347,7 +347,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    item['label'],
+                    provider.tr(item['label']),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
