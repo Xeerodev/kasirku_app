@@ -494,7 +494,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _handleBackupJson(BuildContext context, PosProvider provider) {
+    final jsonStr = provider.getBackupJson();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.backup, color: Color(0xFF0D47A1)),
+            const SizedBox(width: 12),
+            Text(provider.language == 'Indonesia' ? 'Cadangkan Data' : 'Data Backup', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              provider.language == 'Indonesia'
+                ? 'Data Anda siap untuk dicadangkan secara offline.'
+                : 'Your data is ready to be backed up offline.',
+              style: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.black87, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                'backup_kasirku_${DateTime.now().millisecondsSinceEpoch}.json',
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 10, color: Colors.blue),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+        ],
+      ),
+    );
+  }
+
   void _showFloatingPopup(BuildContext context, String message, {bool isError = false}) {
+    final isDark = Provider.of<PosProvider>(context, listen: false).isDarkMode;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
