@@ -33,7 +33,7 @@ class _PosScreenState extends State<PosScreen> {
     final provider = Provider.of<PosProvider>(context);
     final currencyFormatter = NumberFormat.currency(
       locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
-      symbol: provider.language == 'Indonesia' ? 'Rp ' : '$',
+      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
       decimalDigits: 0,
     );
 
@@ -354,7 +354,7 @@ class _PosScreenState extends State<PosScreen> {
   void _showCartBottomSheet(BuildContext context, PosProvider provider) {
     final formatter = NumberFormat.currency(
       locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
-      symbol: provider.language == 'Indonesia' ? 'Rp ' : '$',
+      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
       decimalDigits: 0,
     );
     final isDark = provider.isDarkMode;
@@ -456,7 +456,7 @@ class _PosScreenState extends State<PosScreen> {
   void _showPaymentFlow(BuildContext context, PosProvider provider) {
     final currencyFormatter = NumberFormat.currency(
       locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
-      symbol: provider.language == 'Indonesia' ? 'Rp ' : '$',
+      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
       decimalDigits: 0,
     );
     final isDark = provider.isDarkMode;
@@ -547,7 +547,7 @@ class _PosScreenState extends State<PosScreen> {
                               decoration: InputDecoration(
                                 labelText: provider.language == 'Indonesia' ? 'Uang Diterima' : 'Received Money',
                                 labelStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
-                                prefixText: provider.language == 'Indonesia' ? 'Rp ' : '$ ',
+                                prefixText: provider.language == 'Indonesia' ? 'Rp ' : r'$ ',
                                 prefixStyle: TextStyle(color: isDark ? Colors.white : Colors.black87),
                                 border: const OutlineInputBorder(),
                                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
@@ -695,7 +695,7 @@ class _PosScreenState extends State<PosScreen> {
   void _showSuccessReceipt(BuildContext context, TransactionModel trx, PosProvider provider, double paidAmount) {
     final currencyFormatter = NumberFormat.currency(
       locale: provider.language == 'Indonesia' ? 'id_ID' : 'en_US',
-      symbol: provider.language == 'Indonesia' ? 'Rp ' : '$',
+      symbol: provider.language == 'Indonesia' ? 'Rp ' : r'$',
       decimalDigits: 0,
     );
     final isDark = provider.isDarkMode;
@@ -766,7 +766,7 @@ class _PosScreenState extends State<PosScreen> {
                                       Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
                                     ],
                                   ),
-                                  Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '').replaceAll('$', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
+                                  Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '').replaceAll(r'$', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
                                 ],
                               ),
                             )),
