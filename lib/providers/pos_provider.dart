@@ -72,8 +72,10 @@ class PosProvider with ChangeNotifier {
     phone: '0812-3456-7890',
     cashierName: 'Ahmad (Kasir 1)',
     logoUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
+    isConfigured: false,
   );
   bool _isDarkMode = false;
+  bool _isLoggedIn = false;
 
   // Settings matching React
   String _activePrinter = 'Epson TM-T82X (USB)';
@@ -86,6 +88,7 @@ class PosProvider with ChangeNotifier {
   List<TransactionModel> get transactions => _transactions;
   StoreProfile get storeProfile => _storeProfile;
   bool get isDarkMode => _isDarkMode;
+  bool get isLoggedIn => _isLoggedIn;
 
   String get activePrinter => _activePrinter;
   bool get autoPrintReceipt => _autoPrintReceipt;
@@ -114,6 +117,18 @@ class PosProvider with ChangeNotifier {
 
   PosProvider() {
     _loadFromPrefs();
+  }
+
+  void login() {
+    _isLoggedIn = true;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void logout() {
+    _isLoggedIn = false;
+    _saveToPrefs();
+    notifyListeners();
   }
 
   void toggleDarkMode() {
@@ -271,6 +286,7 @@ class PosProvider with ChangeNotifier {
   Future<void> _saveToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isDarkMode', _isDarkMode);
+    prefs.setBool('isLoggedIn', _isLoggedIn);
     prefs.setString('storeProfile', jsonEncode(_storeProfile.toJson()));
     prefs.setString('products', jsonEncode(_products.map((p) => p.toJson()).toList()));
     prefs.setString('transactions', jsonEncode(_transactions.map((t) => t.toJson()).toList()));
@@ -283,6 +299,7 @@ class PosProvider with ChangeNotifier {
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     _activePrinter = prefs.getString('activePrinter') ?? 'Epson TM-T82X (USB)';
     _autoPrintReceipt = prefs.getBool('autoPrintReceipt') ?? true;
     _footerMessage = prefs.getString('footerMessage') ?? 'Terima kasih atas kunjungan Anda!\nBarang yang sudah dibeli tidak dapat ditukar.';

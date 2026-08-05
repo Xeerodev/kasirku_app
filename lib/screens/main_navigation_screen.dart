@@ -68,9 +68,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Container(
             height: 70,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            border: Border(
-              bottom: BorderSide(
-                color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05),
+                ),
               ),
             ),
             child: Row(

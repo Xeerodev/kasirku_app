@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/pos_provider.dart';
 import 'screens/main_navigation_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/setup_store_screen.dart';
 
 void main() {
   runApp(
@@ -12,12 +14,30 @@ void main() {
   );
 }
 
-class KasirkuApp extends StatelessWidget {
+class KasirkuApp extends StatefulWidget {
   const KasirkuApp({super.key});
+
+  @override
+  State<KasirkuApp> createState() => _KasirkuAppState();
+}
+
+class _KasirkuAppState extends State<KasirkuApp> {
+  String _currentAuthView = 'login'; // 'login' or 'setup'
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
+
+    Widget home;
+    if (!provider.isLoggedIn) {
+      if (!provider.storeProfile.isConfigured && _currentAuthView == 'setup') {
+        home = SetupStoreScreen(onSwitchToLogin: () => setState(() => _currentAuthView = 'login'));
+      } else {
+        home = LoginScreen(onSwitchToSetup: () => setState(() => _currentAuthView = 'setup'));
+      }
+    } else {
+      home = const MainNavigationScreen();
+    }
 
     return MaterialApp(
       title: 'Kasirku POS',
@@ -48,7 +68,7 @@ class KasirkuApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color(0xFF0B1C30),
       ),
-      home: const MainNavigationScreen(),
+      home: home,
     );
   }
 }
