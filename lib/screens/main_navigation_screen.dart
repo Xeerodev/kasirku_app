@@ -84,8 +84,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.black12),
+                    image: const DecorationImage(
+                      image: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg'),
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  child: const Icon(Icons.store, color: Color(0xFF0D47A1), size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -96,7 +99,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       Text(
                         provider.storeProfile.name,
                         style: const TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF0D47A1),
                         ),
@@ -104,8 +107,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const Text(
-                        'Kasirku POS',
-                        style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold),
+                        'Developed by Xeerodev',
+                        style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),

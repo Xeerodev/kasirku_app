@@ -50,45 +50,48 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                         border: Border(right: BorderSide(color: Colors.black.withOpacity(0.05))),
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 200,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: Colors.blue.withOpacity(0.2)),
-                                ),
-                                child: Image.network(
-                                  'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                              const SizedBox(height: 32),
-                              const Text('Atur Toko Anda', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Kelola inventaris, lacak penjualan, dan kembangkan bisnis Anda dengan Kasirku POS.',
-                                style: TextStyle(fontSize: 16, color: Color(0xFF45464D), height: 1.5),
-                              ),
-                              const SizedBox(height: 24),
-                              _buildInfoPoint(Icons.cloud_off, 'Berbasis Offline', 'Data tersimpan aman di perangkat Anda tanpa perlu internet.'),
-                              _buildInfoPoint(Icons.code, 'Pengembang', 'Dikembangkan oleh Xeerodev untuk solusi UMKM modern.'),
-                            ],
-                          ),
                           Container(
-                            padding: const EdgeInsets.all(24),
+                            width: 200,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [BoxShadow(color: Colors.blue.withOpacity(0.1), blurRadius: 20)],
+                              border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                            ),
+                            child: Image.network(
+                              'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          const Text(
+                            'Atur Toko Anda',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1), letterSpacing: -1),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Kelola inventaris, lacak penjualan, dan kembangkan bisnis Anda dengan Kasirku POS.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, color: Color(0xFF45464D), height: 1.5),
+                          ),
+                          const SizedBox(height: 40),
+                          _buildInfoPoint(Icons.cloud_off, 'Berbasis Offline', 'Data tersimpan aman di perangkat Anda tanpa perlu internet.'),
+                          _buildInfoPoint(Icons.code, 'Pengembang', 'Dikembangkan oleh Xeerodev untuk solusi UMKM modern.'),
+                          const SizedBox(height: 40),
+                          Container(
+                            padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.blue.withOpacity(0.2))),
                             child: const Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.speed, color: Color(0xFF0D47A1), size: 32),
+                                Icon(Icons.speed, color: Color(0xFF0D47A1), size: 28),
                                 SizedBox(width: 16),
-                                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Dibuat untuk Kecepatan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0D47A1))), Text('Antarmuka kami dioptimalkan untuk lingkungan ritel berkecepatan tinggi.', style: TextStyle(fontSize: 12, color: Color(0xFF45464D)))]))
+                                Flexible(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Dibuat untuk Kecepatan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF0D47A1))), Text('Dioptimalkan untuk lingkungan ritel cepat.', style: TextStyle(fontSize: 11, color: Color(0xFF45464D)))]))
                               ],
                             ),
                           ),
@@ -100,24 +103,37 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                 // Right Form
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.all(width > 800 ? 48 : 24),
+                    padding: EdgeInsets.all(width > 800 ? 60 : 24),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
                           width: double.infinity,
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Container(width: 64, height: 64, decoration: BoxDecoration(color: const Color(0xFF0D47A1), borderRadius: BorderRadius.circular(16)), child: const Icon(Icons.storefront, color: Colors.white, size: 32)),
-                              const SizedBox(height: 16),
-                              const Text('Atur Toko Anda', textAlign: TextAlign.center, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                              const Text('Registrasi toko usaha baru', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Color(0xFF45464D))),
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0D47A1),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [BoxShadow(color: const Color(0xFF0D47A1).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 5))],
+                                ),
+                                child: const Icon(Icons.storefront, color: Colors.white, size: 40),
+                              ),
+                              const SizedBox(height: 24),
+                              const Text('Atur Toko Anda', textAlign: TextAlign.center, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1), letterSpacing: -0.5)),
+                              const SizedBox(height: 8),
+                              const Text('Registrasi toko usaha baru Anda secara offline.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Color(0xFF45464D))),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 40),
 
-                        const Align(alignment: Alignment.centerLeft, child: Text('Upload Logo Toko', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold))),
+                        Align(alignment: Alignment.centerLeft, child: Text('Upload Logo Toko', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1).withOpacity(0.8)))),
                         const SizedBox(height: 8),
                         InkWell(
                           onTap: () async {
