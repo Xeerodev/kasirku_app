@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,17 +50,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
+    final isDark = provider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: provider.isDarkMode ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
+      backgroundColor: isDark ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
       appBar: AppBar(
-        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
         elevation: 0,
         title: Row(
           children: [
-            Icon(Icons.settings, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF003178)),
+            Icon(Icons.settings, color: isDark ? Colors.lightBlueAccent : const Color(0xFF003178)),
             const SizedBox(width: 12),
-            Text('Pengaturan', style: TextStyle(color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF003178), fontWeight: FontWeight.bold)),
+            Text('Pengaturan', style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF003178), fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -82,6 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSection(
               title: 'Profil Toko & Kasir',
               icon: Icons.store,
+              isDark: isDark,
               child: Column(
                 children: [
                   Row(
@@ -93,18 +96,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             width: 100,
                             height: 100,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE9F5FF),
+                              color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFE9F5FF),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.black.withOpacity(0.1)),
-                              image: provider.storeProfile.logoUrl.isNotEmpty ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover) : null,
+                              border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.1)),
+                              image: provider.storeProfile.logoUrl.isNotEmpty
+                                ? (provider.storeProfile.logoUrl.startsWith('http')
+                                    ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                                    : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover))
+                                : null,
                             ),
-                            child: provider.storeProfile.logoUrl.isEmpty ? const Icon(Icons.storefront, size: 40, color: Colors.grey) : null,
+                            child: provider.storeProfile.logoUrl.isEmpty ? Icon(Icons.storefront, size: 40, color: isDark ? Colors.white24 : Colors.grey) : null,
                           ),
                           TextButton(
-                            onPressed: () {
-                              _showLogoUrlPrompt(context, provider);
-                            },
-                            child: const Text('Ubah Logo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                            onPressed: () => _showLogoUrlPrompt(context, provider),
+                            child: Text('Ubah Logo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
                           ),
                         ],
                       ),
@@ -112,18 +117,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Expanded(
                         child: Column(
                           children: [
-                            _buildTextField(controller: _nameController, label: 'Nama Toko'),
+                            _buildTextField(controller: _nameController, label: 'Nama Toko', isDark: isDark),
                             const SizedBox(height: 12),
-                            _buildTextField(controller: _cashierController, label: 'Nama Kasir'),
+                            _buildTextField(controller: _cashierController, label: 'Nama Kasir', isDark: isDark),
                           ],
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _addressController, label: 'Alamat', maxLines: 2, isDark: provider.isDarkMode),
+                  _buildTextField(controller: _addressController, label: 'Alamat', maxLines: 2, isDark: isDark),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _phoneController, label: 'Nomor Telepon', isDark: provider.isDarkMode),
+                  _buildTextField(controller: _phoneController, label: 'Nomor Telepon', isDark: isDark),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -150,16 +155,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSection(
               title: 'Printer & Struk',
               icon: Icons.print,
+              isDark: isDark,
               child: Column(
                 children: [
                   DropdownButtonFormField<String>(
+                    dropdownColor: isDark ? const Color(0xFF12253C) : Colors.white,
                     value: provider.activePrinter,
-                    decoration: const InputDecoration(labelText: 'Printer Aktif', border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)))),
-                    items: const [
-                      DropdownMenuItem(value: 'Epson TM-T82X (USB)', child: Text('Epson TM-T82X (USB)')),
-                      DropdownMenuItem(value: 'Bluetooth Printer 58mm', child: Text('Bluetooth Printer 58mm')),
-                      DropdownMenuItem(value: 'Tidak ada printer', child: Text('Tidak ada printer')),
-                    ],
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    decoration: InputDecoration(
+                      labelText: 'Printer Aktif',
+                      labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+                      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                      enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+                    ),
+                    items: ['Epson TM-T82X (USB)', 'Bluetooth Printer 58mm', 'Tidak ada printer'].map((val) => DropdownMenuItem(value: val, child: Text(val, style: TextStyle(color: isDark ? Colors.white : Colors.black87)))).toList(),
                     onChanged: (val) => provider.updatePrinterSettings(printer: val),
                   ),
                   const SizedBox(height: 16),
@@ -167,15 +176,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     label: 'Cetak struk otomatis',
                     value: provider.autoPrintReceipt,
                     onChanged: (val) => provider.updatePrinterSettings(autoPrint: val),
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField(controller: _footerController, label: 'Pesan Footer Struk', maxLines: 3),
+                  _buildTextField(controller: _footerController, label: 'Pesan Footer Struk', maxLines: 3, isDark: isDark),
                   const SizedBox(height: 16),
                   OutlinedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.receipt, size: 18),
                     label: const Text('Test Print Struk'),
-                    style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), side: const BorderSide(color: Color(0xFF0061A4)), foregroundColor: const Color(0xFF0061A4), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      side: BorderSide(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0061A4)),
+                      foregroundColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0061A4),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
+                    ),
                   ),
                 ],
               ),
@@ -187,6 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildSection(
               title: 'Sistem & Masukan',
               icon: Icons.settings_system_daydream,
+              isDark: isDark,
               child: Column(
                 children: [
                   _buildDropdownRow(
@@ -202,7 +218,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.dark_mode,
                     value: provider.isDarkMode,
                     onChanged: (val) => provider.updateSystemSettings(dark: val),
-                    isDark: provider.isDarkMode,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () => _showChangePasswordDialog(context, provider),
+                    icon: const Icon(Icons.lock_reset),
+                    label: const Text('Ubah Kata Sandi Admin'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0D47A1),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
@@ -218,8 +246,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     label: const Text('Cadangkan Data JSON'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
-                      side: BorderSide(color: provider.isDarkMode ? Colors.white24 : Colors.grey),
-                      foregroundColor: provider.isDarkMode ? Colors.white70 : Colors.black87,
+                      side: BorderSide(color: isDark ? Colors.white24 : Colors.grey),
+                      foregroundColor: isDark ? Colors.white70 : Colors.black87,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
                     ),
                   ),
@@ -232,14 +260,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Section 4: Logout
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05)), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))]),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF12253C) : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))]
+              ),
               child: Column(
                 children: [
                   Container(width: 56, height: 56, decoration: const BoxDecoration(color: Color(0xFFFFDAD6), shape: BoxShape.circle), child: const Icon(Icons.logout, color: Color(0xFF93000A), size: 30)),
                   const SizedBox(height: 12),
-                  Text('Keluar dari Sesi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: provider.isDarkMode ? Colors.white : Colors.black87)),
+                  Text('Keluar dari Sesi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
                   const SizedBox(height: 4),
-                  Text('Pastikan semua transaksi telah selesai sebelum keluar dari aplikasi.', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: provider.isDarkMode ? Colors.white54 : Colors.grey)),
+                  Text('Pastikan semua transaksi telah selesai sebelum keluar dari aplikasi.', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.grey)),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () => provider.logout(),
@@ -256,8 +289,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSection({required String title, required IconData icon, required Widget child}) {
-    final isDark = Provider.of<PosProvider>(context, listen: false).isDarkMode;
+  Widget _buildSection({required String title, required IconData icon, required Widget child, required bool isDark}) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -293,6 +325,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.grey),
         border: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
         enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+        focusedBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
@@ -311,7 +344,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? Colors.white70 : Colors.black87)),
             ],
           ),
-          Switch(value: value, onChanged: onChanged, activeColor: const Color(0xFF0061A4)),
+          Switch(value: value, onChanged: onChanged, activeColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0061A4)),
         ],
       ),
     );
@@ -347,17 +380,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showLogoUrlPrompt(BuildContext context, PosProvider provider) {
     final controller = TextEditingController(text: provider.storeProfile.logoUrl);
+    final isDark = provider.isDarkMode;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
-        title: Text('URL Logo Baru', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
+        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
+        title: Text('URL Logo Baru', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
         content: TextField(
           controller: controller,
-          style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
           decoration: InputDecoration(
             hintText: 'https://...',
-            hintStyle: TextStyle(color: provider.isDarkMode ? Colors.white38 : Colors.grey),
+            hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
           )
         ),
         actions: [
@@ -366,6 +400,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () {
               provider.updateStoreProfile(provider.storeProfile.copyWith(logoUrl: controller.text));
               Navigator.pop(ctx);
+              _showFloatingPopup(context, 'Logo berhasil diperbarui', isError: false);
             },
             child: const Text('Simpan'),
           ),
@@ -376,26 +411,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showChangePasswordDialog(BuildContext context, PosProvider provider) {
     final newPassCtrl = TextEditingController();
+    final isDark = provider.isDarkMode;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Ubah Kata Sandi Admin', style: TextStyle(fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white : Colors.black87)),
+        title: Text('Ubah Kata Sandi Admin', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Kata sandi saat ini digunakan untuk masuk ke aplikasi Kasirku.', style: TextStyle(fontSize: 12, color: provider.isDarkMode ? Colors.white54 : Colors.grey)),
+            Text('Kata sandi saat ini digunakan untuk masuk ke aplikasi Kasirku.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
             const SizedBox(height: 16),
             TextField(
               controller: newPassCtrl,
               obscureText: true,
-              style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
                 labelText: 'Kata Sandi Baru',
                 hintText: 'Masukkan minimal 6 karakter',
                 border: const OutlineInputBorder(),
-                labelStyle: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.grey),
+                labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300)),
               ),
             ),
           ],
@@ -421,7 +458,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showFloatingPopup(BuildContext context, String message, {bool isError = false}) {
-    final isDark = Provider.of<PosProvider>(context, listen: false).isDarkMode;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -431,7 +467,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Expanded(child: Text(message, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white))),
           ],
         ),
-        backgroundColor: isError ? const Color(0xFFBA1A1A) : const Color(0xFF0D47A1),
+        backgroundColor: isError ? const Color(0xFFBA1A1A) : const Color(0xFF006C49),
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.only(
           bottom: MediaQuery.of(context).size.height - 140,
