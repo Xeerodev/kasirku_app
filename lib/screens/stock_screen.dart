@@ -239,7 +239,28 @@ class _StockScreenState extends State<StockScreen> {
               children: [
                 Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(ctx), style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Batal'))),
                 const SizedBox(width: 12),
-                Expanded(child: ElevatedButton(onPressed: () { provider.deleteProduct(product.id); Navigator.pop(ctx); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Hapus'))),
+                Expanded(child: ElevatedButton(onPressed: () {
+                  provider.deleteProduct(product.id);
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Row(
+                        children: [
+                          Icon(Icons.delete_forever, color: Colors.white, size: 20),
+                          SizedBox(width: 12),
+                          Text('Produk berhasil dihapus!'),
+                        ],
+                      ),
+                      backgroundColor: const Color(0xFFBA1A1A),
+                      behavior: SnackBarBehavior.floating,
+                      margin: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).size.height - 100,
+                        left: 20,
+                        right: 20,
+                      ),
+                    ),
+                  );
+                }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Hapus'))),
               ],
             ),
           ],
@@ -425,13 +446,25 @@ class _StockScreenState extends State<StockScreen> {
                               description: descCtrl.text,
                             ));
                             Navigator.pop(ctx);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(productToEdit == null ? 'Produk berhasil ditambahkan!' : 'Perubahan produk berhasil disimpan!'),
-                                backgroundColor: const Color(0xFF0D47A1),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    Text(productToEdit == null ? 'Produk berhasil ditambahkan!' : 'Perubahan produk berhasil disimpan!'),
+                  ],
+                ),
+                backgroundColor: const Color(0xFF0D47A1),
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height - 100,
+                  left: 20,
+                  right: 20,
+                ),
+                duration: const Duration(seconds: 2),
+              ),
+            );
                           },
                           child: const Text('Simpan Produk'),
                         ),
