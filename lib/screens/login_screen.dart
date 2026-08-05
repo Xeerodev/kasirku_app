@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/pos_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,6 +12,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController(text: 'kasirku_admin');
   final _passwordController = TextEditingController(text: '123456');
+
+  void _handleContactDev() async {
+    final url = Uri.parse('https://wa.me/6283164004093?text=Halo%20Developer%20Kasirku');
+    if (!await launchUrl(url)) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tidak dapat membuka WhatsApp')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: const Text('Atur Toko Baru', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
                           ),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: _handleContactDev,
                             child: const Text('Hubungi Developer', style: TextStyle(fontSize: 12, color: Color(0xFF45464D))),
                           ),
                         ],

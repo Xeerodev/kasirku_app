@@ -30,7 +30,7 @@ class _KasirkuAppState extends State<KasirkuApp> {
 
     Widget home;
     if (!provider.isLoggedIn) {
-      if (!provider.storeProfile.isConfigured && _currentAuthView == 'setup') {
+      if (_currentAuthView == 'setup') {
         home = SetupStoreScreen(onSwitchToLogin: () => setState(() => _currentAuthView = 'login'));
       } else {
         home = LoginScreen(onSwitchToSetup: () => setState(() => _currentAuthView = 'setup'));
