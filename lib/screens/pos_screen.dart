@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -33,7 +35,6 @@ class _PosScreenState extends State<PosScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
-    // ALWAYS IDR as requested
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
@@ -698,6 +699,19 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
+  Future<void> _handlePrint(BuildContext context, TransactionModel trx, StoreProfile store, String lang) async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Fitur print tidak didukung di web' : 'Print feature not supported on web')));
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Sedang mencetak...' : 'Printing...')));
+    final result = await _printerService.printReceipt(trx, store);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result), behavior: SnackBarBehavior.floating));
+    }
+  }
+
   void _showSuccessReceipt(BuildContext context, TransactionModel trx, PosProvider provider, double paidAmount) {
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
@@ -705,6 +719,8 @@ class _PosScreenState extends State<PosScreen> {
       decimalDigits: 0,
     );
     final isDark = provider.isDarkMode;
+    final lang = provider.language;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -723,7 +739,7 @@ class _PosScreenState extends State<PosScreen> {
                 child: const Icon(Icons.check_circle, color: Colors.green, size: 40),
               ),
               const SizedBox(height: 12),
-              Text(provider.language == 'Indonesia' ? 'Transaksi Berhasil!' : 'Transaction Success!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+              Text(lang == 'Indonesia' ? 'Transaksi Berhasil!' : 'Transaction Success!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               Text(trx.invoiceNumber, style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
               const SizedBox(height: 16),
 
@@ -753,9 +769,9 @@ class _PosScreenState extends State<PosScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('No: ${trx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
-                                  Text('${provider.language == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${trx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
-                                  Text('${provider.language == 'Indonesia' ? 'Waktu' : 'Time'}: ${trx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
-                                  Text('${provider.language == 'Indonesia' ? 'Metode' : 'Method'}: ${trx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                  Text('${lang == 'Indonesia' ? 'Kasir' : 'Cashier'}: ${trx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                  Text('${lang == 'Indonesia' ? 'Waktu' : 'Time'}: ${trx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                  Text('${lang == 'Indonesia' ? 'Metode' : 'Method'}: ${trx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
                                 ],
                               ),
                             ),
@@ -779,8 +795,8 @@ class _PosScreenState extends State<PosScreen> {
                             const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black)), Text(currencyFormatter.format(trx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))]),
                             if (trx.paymentMethod == 'Tunai' || trx.paymentMethod == 'Cash') ...[
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(provider.language == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(paidAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(provider.language == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(trx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'TUNAI' : 'CASH', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(paidAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(lang == 'Indonesia' ? 'KEMBALI' : 'CHANGE', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(trx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
                             ],
                             const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
                             Text(provider.footerMessage, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
@@ -797,9 +813,9 @@ class _PosScreenState extends State<PosScreen> {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(provider.language == 'Indonesia' ? 'Mencetak struk...' : 'Printing receipt...'))),
+                      onPressed: () => _handlePrint(context, trx, provider.storeProfile, lang),
                       icon: const Icon(Icons.print, size: 16),
-                      label: Text(provider.language == 'Indonesia' ? 'Cetak' : 'Print'),
+                      label: Text(lang == 'Indonesia' ? 'Cetak' : 'Print'),
                       style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
                     ),
                   ),
@@ -808,7 +824,7 @@ class _PosScreenState extends State<PosScreen> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(ctx),
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),
-                      child: Text(provider.language == 'Indonesia' ? 'Selesai' : 'Done'),
+                      child: Text(lang == 'Indonesia' ? 'Selesai' : 'Done'),
                     ),
                   ),
                 ],

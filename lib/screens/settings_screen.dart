@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
 import '../providers/pos_provider.dart';
 import '../models/store_profile.dart';
+import '../services/printer_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -19,6 +21,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _cashierController;
   late TextEditingController _footerController;
+  final PrinterService _printerService = PrinterService();
+  bool _isPrinterConnected = false;
 
   @override
   void initState() {
@@ -29,6 +33,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _phoneController = TextEditingController(text: provider.storeProfile.phone);
     _cashierController = TextEditingController(text: provider.storeProfile.cashierName);
     _footerController = TextEditingController(text: provider.footerMessage);
+    _checkPrinterStatus();
+  }
+
+  Future<void> _checkPrinterStatus() async {
+    if (kIsWeb) return;
+    bool connected = await _printerService.isConnected();
+    setState(() => _isPrinterConnected = connected);
   }
 
   @override
@@ -42,7 +53,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _handleContactDev() async {
-    final url = Uri.parse('https://wa.me/6283164004093?text=mau%20kasih%20masukan');
+    final url = Uri.parse('https://wa.me/6283164004093?text=Halo%20Developer%20Kasirku');
     if (!await launchUrl(url)) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tidak dapat membuka WhatsApp')));
     }
@@ -196,6 +207,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
     final isDark = provider.isDarkMode;
+    final lang = provider.language;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
@@ -215,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: TextButton.icon(
               onPressed: _handleContactDev,
               icon: const Icon(Icons.chat, size: 16, color: Colors.white),
-              label: const Text('Hubungi Dev', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+              label: Text(lang == 'Indonesia' ? 'Hubungi Dev' : 'Contact Dev', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
               style: TextButton.styleFrom(backgroundColor: const Color(0xFF25D366), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             ),
           ),
@@ -254,7 +266,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           TextButton(
                             onPressed: () => _handleLogoPick(context, provider),
-                            child: Text(provider.language == 'Indonesia' ? 'Ubah Logo' : 'Change Logo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
+                            child: Text(lang == 'Indonesia' ? 'Ubah Logo' : 'Change Logo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
                           ),
                         ],
                       ),
@@ -262,18 +274,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Expanded(
                         child: Column(
                           children: [
-                            _buildTextField(controller: _nameController, label: provider.language == 'Indonesia' ? 'Nama Toko' : 'Store Name', isDark: isDark),
+                            _buildTextField(controller: _nameController, label: lang == 'Indonesia' ? 'Nama Toko' : 'Store Name', isDark: isDark),
                             const SizedBox(height: 12),
-                            _buildTextField(controller: _cashierController, label: provider.language == 'Indonesia' ? 'Nama Kasir' : 'Cashier Name', isDark: isDark),
+                            _buildTextField(controller: _cashierController, label: lang == 'Indonesia' ? 'Nama Kasir' : 'Cashier Name', isDark: isDark),
                           ],
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _addressController, label: provider.language == 'Indonesia' ? 'Alamat' : 'Address', maxLines: 2, isDark: isDark),
+                  _buildTextField(controller: _addressController, label: lang == 'Indonesia' ? 'Alamat' : 'Address', maxLines: 2, isDark: isDark),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _phoneController, label: provider.language == 'Indonesia' ? 'Nomor Telepon' : 'Phone Number', isDark: isDark),
+                  _buildTextField(controller: _phoneController, label: lang == 'Indonesia' ? 'Nomor Telepon' : 'Phone Number', isDark: isDark),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -285,10 +297,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         logoUrl: provider.storeProfile.logoUrl,
                         isConfigured: true,
                       ));
-                      _showFloatingPopup(context, provider.language == 'Indonesia' ? 'Profil berhasil disimpan' : 'Profile saved successfully', isError: false);
+                      _showFloatingPopup(context, lang == 'Indonesia' ? 'Profil berhasil disimpan' : 'Profile saved successfully', isError: false);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061A4), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: Text(provider.language == 'Indonesia' ? 'Simpan Profil & Kasir' : 'Save Profile & Cashier', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(lang == 'Indonesia' ? 'Simpan Profil & Kasir' : 'Save Profile & Cashier', style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -303,12 +315,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isDark: isDark,
               child: Column(
                 children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _isPrinterConnected ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(lang == 'Indonesia' ? 'Status Printer' : 'Printer Status', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                            Row(
+                              children: [
+                                Icon(Icons.circle, size: 8, color: _isPrinterConnected ? Colors.green : Colors.red),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _isPrinterConnected
+                                    ? (lang == 'Indonesia' ? 'Terhubung' : 'Connected')
+                                    : (lang == 'Indonesia' ? 'Tidak Ada Printer Terhubung' : 'No Printer Connected'),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white70 : Colors.black87),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: _checkPrinterStatus,
+                          icon: const Icon(Icons.refresh, size: 20),
+                          tooltip: lang == 'Indonesia' ? 'Cek Koneksi' : 'Check Status',
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     dropdownColor: isDark ? const Color(0xFF12253C) : Colors.white,
                     value: provider.activePrinter,
                     style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                     decoration: InputDecoration(
-                      labelText: provider.language == 'Indonesia' ? 'Printer Aktif' : 'Active Printer',
+                      labelText: lang == 'Indonesia' ? 'Printer Aktif' : 'Active Printer',
                       labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
                       border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
                       enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
@@ -318,25 +367,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 16),
                   _buildSwitchRow(
-                    label: provider.language == 'Indonesia' ? 'Cetak struk otomatis' : 'Auto print receipt',
+                    label: lang == 'Indonesia' ? 'Cetak struk otomatis' : 'Auto print receipt',
                     value: provider.autoPrintReceipt,
                     onChanged: (val) => provider.updatePrinterSettings(autoPrint: val),
                     isDark: isDark,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField(controller: _footerController, label: provider.language == 'Indonesia' ? 'Pesan Footer Struk' : 'Receipt Footer Message', maxLines: 3, isDark: isDark),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.receipt, size: 18),
-                    label: Text(provider.language == 'Indonesia' ? 'Test Print Struk' : 'Test Print Receipt'),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                      side: BorderSide(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0061A4)),
-                      foregroundColor: isDark ? Colors.lightBlueAccent : const Color(0xFF0061A4),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
-                    ),
-                  ),
+                  _buildTextField(controller: _footerController, label: lang == 'Indonesia' ? 'Pesan Footer Struk' : 'Receipt Footer Message', maxLines: 3, isDark: isDark),
                 ],
               ),
             ),
@@ -345,7 +382,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             // Section 3: Sistem
             _buildSection(
-              title: provider.language == 'Indonesia' ? 'Sistem & Masukan' : 'System & Feedback',
+              title: lang == 'Indonesia' ? 'Sistem & Masukan' : 'System & Feedback',
               icon: Icons.settings_system_daydream,
               isDark: isDark,
               child: Column(
@@ -381,14 +418,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ElevatedButton.icon(
                     onPressed: _handleContactDev,
                     icon: const Icon(Icons.chat),
-                    label: Text(provider.language == 'Indonesia' ? 'Hubungi Developer (WhatsApp)' : 'Contact Developer (WhatsApp)'),
+                    label: Text(lang == 'Indonesia' ? 'Hubungi Developer (WhatsApp)' : 'Contact Developer (WhatsApp)'),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: () => _handleBackupJson(context, provider),
                     icon: const Icon(Icons.backup),
-                    label: Text(provider.language == 'Indonesia' ? 'Cadangkan Data JSON' : 'Backup JSON Data'),
+                    label: Text(lang == 'Indonesia' ? 'Cadangkan Data JSON' : 'Backup JSON Data'),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
                       side: BorderSide(color: isDark ? Colors.white24 : Colors.grey),
@@ -418,7 +455,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Text(provider.tr('logout'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
                   const SizedBox(height: 4),
                   Text(
-                    provider.language == 'Indonesia'
+                    lang == 'Indonesia'
                       ? 'Pastikan semua transaksi telah selesai sebelum keluar dari aplikasi.'
                       : 'Ensure all transactions are completed before logging out.',
                     textAlign: TextAlign.center,
@@ -428,7 +465,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ElevatedButton(
                     onPressed: () => provider.logout(),
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFBA1A1A), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: Text(provider.language == 'Indonesia' ? 'Keluar' : 'Logout', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(lang == 'Indonesia' ? 'Keluar' : 'Logout', style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/pos_provider.dart';
 import '../models/transaction.dart';
+import '../models/store_profile.dart';
+import '../services/printer_service.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -14,6 +17,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   String _searchQuery = '';
+  final PrinterService _printerService = PrinterService();
 
   @override
   Widget build(BuildContext context) {
@@ -183,6 +187,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  Future<void> _handlePrint(BuildContext context, TransactionModel tx, StoreProfile store, String lang) async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Fitur print tidak didukung di web' : 'Print feature not supported on web')));
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Sedang mencetak...' : 'Printing...')));
+    final result = await _printerService.printReceipt(tx, store);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result), behavior: SnackBarBehavior.floating));
+    }
+  }
+
   void _showTransactionDetail(BuildContext context, TransactionModel tx, PosProvider provider) {
     final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     final isDark = provider.isDarkMode;
@@ -289,9 +306,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(lang == 'Indonesia' ? 'Mencetak struk...' : 'Printing receipt...'), behavior: SnackBarBehavior.floating));
-                      },
+                      onPressed: () => _handlePrint(context, tx, provider.storeProfile, lang),
                       icon: const Icon(Icons.print, size: 16),
                       label: Text(provider.tr('print'), style: const TextStyle(fontSize: 12)),
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(44)),
