@@ -121,9 +121,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _addressController, label: 'Alamat', maxLines: 2),
+                  _buildTextField(controller: _addressController, label: 'Alamat', maxLines: 2, isDark: provider.isDarkMode),
                   const SizedBox(height: 12),
-                  _buildTextField(controller: _phoneController, label: 'Nomor Telepon'),
+                  _buildTextField(controller: _phoneController, label: 'Nomor Telepon', isDark: provider.isDarkMode),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -135,7 +135,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         logoUrl: provider.storeProfile.logoUrl,
                         isConfigured: true,
                       ));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profil berhasil disimpan')));
+                      _showFloatingPopup(context, 'Profil berhasil disimpan', isError: false);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0061A4), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                     child: const Text('Simpan Profil & Kasir', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -202,6 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     icon: Icons.dark_mode,
                     value: provider.isDarkMode,
                     onChanged: (val) => provider.updateSystemSettings(dark: val),
+                    isDark: provider.isDarkMode,
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
@@ -215,7 +216,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: () {},
                     icon: const Icon(Icons.backup),
                     label: const Text('Cadangkan Data JSON'),
-                    style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), side: const BorderSide(color: Colors.grey), foregroundColor: Colors.black87, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      side: BorderSide(color: provider.isDarkMode ? Colors.white24 : Colors.grey),
+                      foregroundColor: provider.isDarkMode ? Colors.white70 : Colors.black87,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
+                    ),
                   ),
                 ],
               ),
@@ -226,14 +232,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Section 4: Logout
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black.withOpacity(0.05)), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))]),
+              decoration: BoxDecoration(color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05)), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))]),
               child: Column(
                 children: [
                   Container(width: 56, height: 56, decoration: const BoxDecoration(color: Color(0xFFFFDAD6), shape: BoxShape.circle), child: const Icon(Icons.logout, color: Color(0xFF93000A), size: 30)),
                   const SizedBox(height: 12),
-                  const Text('Keluar dari Sesi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text('Keluar dari Sesi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: provider.isDarkMode ? Colors.white : Colors.black87)),
                   const SizedBox(height: 4),
-                  const Text('Pastikan semua transaksi telah selesai sebelum keluar dari aplikasi.', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: Colors.grey)),
+                  Text('Pastikan semua transaksi telah selesai sebelum keluar dari aplikasi.', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, color: provider.isDarkMode ? Colors.white54 : Colors.grey)),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () => provider.logout(),
@@ -257,7 +263,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF12253C) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
@@ -265,9 +271,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: const Color(0xFF003178)),
+              Icon(icon, size: 20, color: isDark ? Colors.lightBlueAccent : const Color(0xFF003178)),
               const SizedBox(width: 8),
-              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF003178))),
+              Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF003178))),
             ],
           ),
           const SizedBox(height: 20),
@@ -277,30 +283,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTextField({required TextEditingController controller, required String label, int maxLines = 1}) {
+  Widget _buildTextField({required TextEditingController controller, required String label, int maxLines = 1, bool isDark = false}) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+        labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.grey),
+        border: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+        enabledBorder: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
   }
 
-  Widget _buildSwitchRow({required String label, required bool value, required ValueChanged<bool> onChanged, IconData? icon}) {
+  Widget _buildSwitchRow({required String label, required bool value, required ValueChanged<bool> onChanged, IconData? icon, bool isDark = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.blue.withOpacity(0.1))),
+      decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.blue.withOpacity(0.1))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              if (icon != null) ...[Icon(icon, size: 18, color: Colors.grey), const SizedBox(width: 10)],
-              Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+              if (icon != null) ...[Icon(icon, size: 18, color: isDark ? Colors.white54 : Colors.grey), const SizedBox(width: 10)],
+              Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? Colors.white70 : Colors.black87)),
             ],
           ),
           Switch(value: value, onChanged: onChanged, activeColor: const Color(0xFF0061A4)),
@@ -310,22 +318,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildDropdownRow({required String label, required String value, required List<String> items, required ValueChanged<String?> onChanged, required IconData icon}) {
+    final isDark = Provider.of<PosProvider>(context, listen: false).isDarkMode;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.blue.withOpacity(0.1))),
+      decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.blue.withOpacity(0.1))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: Colors.grey),
+              Icon(icon, size: 18, color: isDark ? Colors.white54 : Colors.grey),
               const SizedBox(width: 10),
-              Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+              Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? Colors.white70 : Colors.black87)),
             ],
           ),
           DropdownButton<String>(
             value: value,
             underline: const SizedBox(),
+            dropdownColor: isDark ? const Color(0xFF12253C) : Colors.white,
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
             items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))).toList(),
             onChanged: onChanged,
           ),
@@ -339,8 +350,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('URL Logo Baru'),
-        content: TextField(controller: controller, decoration: const InputDecoration(hintText: 'https://...')),
+        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        title: Text('URL Logo Baru', style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87)),
+        content: TextField(
+          controller: controller,
+          style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+          decoration: InputDecoration(
+            hintText: 'https://...',
+            hintStyle: TextStyle(color: provider.isDarkMode ? Colors.white38 : Colors.grey),
+          )
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
           ElevatedButton(
@@ -351,6 +370,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Simpan'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context, PosProvider provider) {
+    final newPassCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Ubah Kata Sandi Admin', style: TextStyle(fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.white : Colors.black87)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Kata sandi saat ini digunakan untuk masuk ke aplikasi Kasirku.', style: TextStyle(fontSize: 12, color: provider.isDarkMode ? Colors.white54 : Colors.grey)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: newPassCtrl,
+              obscureText: true,
+              style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                labelText: 'Kata Sandi Baru',
+                hintText: 'Masukkan minimal 6 karakter',
+                border: const OutlineInputBorder(),
+                labelStyle: TextStyle(color: provider.isDarkMode ? Colors.white70 : Colors.grey),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          ElevatedButton(
+            onPressed: () {
+              if (newPassCtrl.text.length < 4) {
+                _showFloatingPopup(context, 'Password terlalu pendek!', isError: true);
+                return;
+              }
+              provider.updatePassword(newPassCtrl.text);
+              Navigator.pop(ctx);
+              _showFloatingPopup(context, 'Kata sandi berhasil diubah', isError: false);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white),
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFloatingPopup(BuildContext context, String message, {bool isError = false}) {
+    final isDark = Provider.of<PosProvider>(context, listen: false).isDarkMode;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(isError ? Icons.error_outline : Icons.check_circle_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white))),
+          ],
+        ),
+        backgroundColor: isError ? const Color(0xFFBA1A1A) : const Color(0xFF0D47A1),
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height - 140,
+          left: 20,
+          right: 20,
+        ),
+        duration: const Duration(seconds: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        elevation: 10,
       ),
     );
   }

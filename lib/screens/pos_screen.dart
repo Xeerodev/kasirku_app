@@ -58,7 +58,7 @@ class _PosScreenState extends State<PosScreen> {
             padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 8),
             decoration: BoxDecoration(
               color: provider.isDarkMode ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
-              border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.05))),
+              border: Border(bottom: BorderSide(color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05))),
             ),
             child: Column(
               children: [
@@ -87,7 +87,9 @@ class _PosScreenState extends State<PosScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.blue.withOpacity(0.4)),
-                          image: DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover),
+                          image: provider.storeProfile.logoUrl.startsWith('http')
+                            ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                            : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover),
                         ),
                       )
                     else
@@ -96,7 +98,7 @@ class _PosScreenState extends State<PosScreen> {
                         height: 40,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          color: provider.isDarkMode ? Colors.white.withOpacity(0.05) : Colors.white,
                           border: Border.all(color: Colors.blue.withOpacity(0.4)),
                         ),
                         child: const Icon(Icons.store, color: Color(0xFF0D47A1)),
@@ -113,10 +115,11 @@ class _PosScreenState extends State<PosScreen> {
                   ),
                   child: TextField(
                     onChanged: (val) => setState(() => _searchQuery = val),
+                    style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
                     decoration: InputDecoration(
                       hintText: 'Cari produk...',
-                      hintStyle: TextStyle(color: provider.isDarkMode ? Colors.grey : const Color(0xFF45464D), fontSize: 14),
-                      prefixIcon: const Icon(Icons.search, color: Color(0xFF76777D)),
+                      hintStyle: TextStyle(color: provider.isDarkMode ? Colors.white38 : const Color(0xFF76777D), fontSize: 14),
+                      prefixIcon: Icon(Icons.search, color: provider.isDarkMode ? Colors.white38 : const Color(0xFF76777D)),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -138,16 +141,9 @@ class _PosScreenState extends State<PosScreen> {
                             decoration: BoxDecoration(
                               color: isSelected ? const Color(0xFF0D47A1) : (provider.isDarkMode ? const Color(0xFF12253C) : const Color(0xFFEFF4FF)),
                               borderRadius: BorderRadius.circular(20),
-                              border: isSelected ? null : Border.all(color: Colors.black.withOpacity(0.1)),
+                              border: isSelected ? null : Border.all(color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.1)),
                             ),
-                            child: Text(
-                              cat,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected ? Colors.white : (provider.isDarkMode ? Colors.white70 : const Color(0xFF45464D)),
-                              ),
-                            ),
+                            child: Text(cat, style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? Colors.white : (provider.isDarkMode ? Colors.white70 : const Color(0xFF45464D)))),
                           ),
                         ),
                       );
@@ -161,7 +157,7 @@ class _PosScreenState extends State<PosScreen> {
           // Product Grid
           Expanded(
             child: filteredProducts.isEmpty
-                ? _buildEmptyState()
+                ? _buildEmptyState(provider)
                 : GridView.builder(
                     padding: const EdgeInsets.all(16),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -186,15 +182,15 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(PosProvider provider) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 64, color: Colors.grey.withOpacity(0.5)),
+          Icon(Icons.search_off, size: 64, color: provider.isDarkMode ? Colors.white10 : Colors.grey.withOpacity(0.5)),
           const SizedBox(height: 8),
-          const Text('Produk tidak ditemukan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          const Text('Coba cari kata kunci lain.', style: TextStyle(color: Colors.grey, fontSize: 12)),
+          Text('Produk tidak ditemukan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: provider.isDarkMode ? Colors.white70 : Colors.black87)),
+          Text('Coba cari kata kunci lain.', style: TextStyle(color: provider.isDarkMode ? Colors.white38 : Colors.grey, fontSize: 12)),
         ],
       ),
     );
@@ -204,12 +200,13 @@ class _PosScreenState extends State<PosScreen> {
     final cartItem = provider.cart.firstWhere((item) => item.product.id == product.id, orElse: () => CartItem(product: product, quantity: 0));
     final qty = cartItem.quantity;
     final isOutOfStock = product.stock == 0;
+    final isDark = provider.isDarkMode;
 
     return Container(
       decoration: BoxDecoration(
-        color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+        color: isDark ? const Color(0xFF12253C) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
@@ -223,7 +220,7 @@ class _PosScreenState extends State<PosScreen> {
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100,
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   child: ClipRRect(
@@ -232,7 +229,7 @@ class _PosScreenState extends State<PosScreen> {
                         ? (product.image.startsWith('http')
                             ? Image.network(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
                             : Image.memory(base64Decode(product.image), fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null))
-                        : const Icon(Icons.local_cafe, size: 40, color: Colors.grey),
+                        : Icon(Icons.local_cafe, size: 40, color: isDark ? Colors.white10 : Colors.grey),
                   ),
                 ),
                 if (isOutOfStock)
@@ -257,11 +254,11 @@ class _PosScreenState extends State<PosScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(product.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white : Colors.black87), maxLines: 2, overflow: TextOverflow.ellipsis),
                   if (!isOutOfStock)
                     Text('Stok: ${product.stock}', style: const TextStyle(color: Color(0xFF006C49), fontWeight: FontWeight.bold, fontSize: 10)),
                   const Spacer(),
-                  Text(formatter.format(product.price), style: const TextStyle(color: Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(formatter.format(product.price), style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 8),
                   // Controls
                   Row(
@@ -272,13 +269,15 @@ class _PosScreenState extends State<PosScreen> {
                         onTap: qty > 0 ? () => provider.removeFromCart(product) : null,
                         isActive: qty > 0,
                         isSecondary: true,
+                        isDark: isDark,
                       ),
-                      Text('$qty', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      Text('$qty', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isDark ? Colors.white : Colors.black87)),
                       _buildControlBtn(
                         icon: Icons.add,
                         onTap: (!isOutOfStock && qty < product.stock) ? () => provider.addToCart(product) : null,
                         isActive: !isOutOfStock && qty < product.stock,
                         isSecondary: false,
+                        isDark: isDark,
                       ),
                     ],
                   ),
@@ -291,17 +290,17 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  Widget _buildControlBtn({required IconData icon, VoidCallback? onTap, required bool isActive, required bool isSecondary}) {
+  Widget _buildControlBtn({required IconData icon, VoidCallback? onTap, required bool isActive, required bool isSecondary, required bool isDark}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: isActive ? (isSecondary ? const Color(0xFF6CF8BB) : const Color(0xFF0D47A1)) : Colors.grey.shade100,
+          color: isActive ? (isSecondary ? const Color(0xFF6CF8BB) : const Color(0xFF0D47A1)) : (isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 16, color: isActive ? (isSecondary ? const Color(0xFF00714D) : Colors.white) : Colors.grey),
+        child: Icon(icon, size: 16, color: isActive ? (isSecondary ? const Color(0xFF00714D) : Colors.white) : (isDark ? Colors.white10 : Colors.grey)),
       ),
     );
   }
@@ -353,6 +352,7 @@ class _PosScreenState extends State<PosScreen> {
 
   void _showCartBottomSheet(BuildContext context, PosProvider provider) {
     final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final isDark = provider.isDarkMode;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -360,18 +360,18 @@ class _PosScreenState extends State<PosScreen> {
       builder: (ctx) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-          color: provider.isDarkMode ? const Color(0xFF0B1C30) : Colors.white,
+          color: isDark ? const Color(0xFF0B1C30) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: isDark ? Colors.white10 : Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Keranjang Belanja', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text('Keranjang Belanja', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                 TextButton.icon(
                   onPressed: () { provider.clearCart(); Navigator.pop(context); },
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
@@ -390,27 +390,24 @@ class _PosScreenState extends State<PosScreen> {
                     leading: Container(
                       width: 50,
                       height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: item.product.image.isNotEmpty
                             ? (item.product.image.startsWith('http')
                                 ? Image.network(item.product.image, fit: BoxFit.cover)
                                 : Image.memory(base64Decode(item.product.image), fit: BoxFit.cover))
-                            : const Icon(Icons.image, color: Colors.grey),
+                            : Icon(Icons.image, color: isDark ? Colors.white10 : Colors.grey),
                       ),
                     ),
-                    title: Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: Text(formatter.format(item.product.price), style: const TextStyle(fontSize: 12)),
+                    title: Text(item.product.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87)),
+                    subtitle: Text(formatter.format(item.product.price), style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildControlBtn(icon: Icons.remove, onTap: () => provider.removeFromCart(item.product), isActive: true, isSecondary: true),
-                        Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold))),
-                        _buildControlBtn(icon: Icons.add, onTap: item.quantity < item.product.stock ? () => provider.addToCart(item.product) : null, isActive: item.quantity < item.product.stock, isSecondary: false),
+                        _buildControlBtn(icon: Icons.remove, onTap: () => provider.removeFromCart(item.product), isActive: true, isSecondary: true, isDark: isDark),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text('${item.quantity}', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87))),
+                        _buildControlBtn(icon: Icons.add, onTap: item.quantity < item.product.stock ? () => provider.addToCart(item.product) : null, isActive: item.quantity < item.product.stock, isSecondary: false, isDark: isDark),
                       ],
                     ),
                   );
@@ -418,10 +415,10 @@ class _PosScreenState extends State<PosScreen> {
               ),
             ),
             const Divider(),
-            _buildPriceRow('Subtotal', formatter.format(provider.cartSubtotal)),
-            _buildPriceRow('Pajak (0%)', formatter.format(0)),
+            _buildPriceRow('Subtotal', formatter.format(provider.cartSubtotal), isDark: isDark),
+            _buildPriceRow('Pajak (0%)', formatter.format(0), isDark: isDark),
             const SizedBox(height: 8),
-            _buildPriceRow('Total Bayar', formatter.format(provider.cartTotal), isTotal: true),
+            _buildPriceRow('Total Bayar', formatter.format(provider.cartTotal), isTotal: true, isDark: isDark),
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -441,19 +438,19 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  Widget _buildPriceRow(String label, String value, {bool isTotal = false}) {
+  Widget _buildPriceRow(String label, String value, {bool isTotal = false, required bool isDark}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: isTotal ? 16 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
-        Text(value, style: TextStyle(fontSize: isTotal ? 18 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal, color: isTotal ? const Color(0xFF0D47A1) : null)),
+        Text(label, style: TextStyle(fontSize: isTotal ? 16 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal, color: isDark ? (isTotal ? Colors.white : Colors.white70) : Colors.black87)),
+        Text(value, style: TextStyle(fontSize: isTotal ? 18 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal, color: isTotal ? (isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)) : (isDark ? Colors.white70 : Colors.black87))),
       ],
     );
   }
 
-  // Improved Payment Flow matching React's PaymentModal
   void _showPaymentFlow(BuildContext context, PosProvider provider) {
     final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final isDark = provider.isDarkMode;
     String paymentMethod = 'Tunai';
     double cashAmount = 0;
     final cashController = TextEditingController(text: '');
@@ -475,6 +472,7 @@ class _PosScreenState extends State<PosScreen> {
           ].where((v) => v >= provider.cartTotal).toSet().toList().take(4).toList();
 
           return Dialog(
+            backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: Container(
               width: double.infinity,
@@ -489,11 +487,11 @@ class _PosScreenState extends State<PosScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Pembayaran', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          const Text('Pilih metode pembayaran transaksi', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                          Text('Pembayaran', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                          Text('Pilih metode pembayaran transaksi', style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
                         ],
                       ),
-                      IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
+                      IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.black54)),
                     ],
                   ),
                   const Divider(),
@@ -509,26 +507,26 @@ class _PosScreenState extends State<PosScreen> {
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.3))),
+                            decoration: BoxDecoration(color: isDark ? const Color(0xFF0D47A1).withOpacity(0.1) : const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.3))),
                             child: Column(
                               children: [
-                                const Text('Total Tagihan (Tanpa Pajak)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                                Text(currencyFormatter.format(provider.cartTotal), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                                Text('Total Tagihan (Tanpa Pajak)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
+                                Text(currencyFormatter.format(provider.cartTotal), style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
                               ],
                             ),
                           ),
                           const SizedBox(height: 20),
 
                           // Method Selection
-                          const Align(alignment: Alignment.centerLeft, child: Text('Metode Pembayaran', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+                          Align(alignment: Alignment.centerLeft, child: Text('Metode Pembayaran', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87))),
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              _buildMethodBtn('Tunai', Icons.payments, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
+                              _buildMethodBtn('Tunai', Icons.payments, paymentMethod, (val) => setDialogState(() => paymentMethod = val), isDark),
                               const SizedBox(width: 8),
-                              _buildMethodBtn('QRIS', Icons.qr_code_scanner, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
+                              _buildMethodBtn('QRIS', Icons.qr_code_scanner, paymentMethod, (val) => setDialogState(() => paymentMethod = val), isDark),
                               const SizedBox(width: 8),
-                              _buildMethodBtn('Kartu', Icons.credit_card, paymentMethod, (val) => setDialogState(() => paymentMethod = val)),
+                              _buildMethodBtn('Kartu', Icons.credit_card, paymentMethod, (val) => setDialogState(() => paymentMethod = val), isDark),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -537,14 +535,23 @@ class _PosScreenState extends State<PosScreen> {
                             TextField(
                               controller: cashController,
                               keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(labelText: 'Uang Diterima', prefixText: 'Rp ', border: OutlineInputBorder()),
+                              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                              decoration: InputDecoration(
+                                labelText: 'Uang Diterima',
+                                labelStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
+                                prefixText: 'Rp ',
+                                prefixStyle: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                                border: const OutlineInputBorder(),
+                                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.grey.shade300)),
+                              ),
                               onChanged: (v) => setDialogState(() => cashAmount = double.tryParse(v) ?? 0),
                             ),
                             const SizedBox(height: 12),
                             Wrap(
                               spacing: 8,
                               children: quickMoneyOptions.map((opt) => ActionChip(
-                                label: Text(currencyFormatter.format(opt), style: const TextStyle(fontSize: 10)),
+                                backgroundColor: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                                label: Text(currencyFormatter.format(opt), style: TextStyle(fontSize: 10, color: isDark ? Colors.white70 : Colors.black87)),
                                 onPressed: () {
                                   setDialogState(() {
                                     cashAmount = opt.toDouble();
@@ -557,7 +564,7 @@ class _PosScreenState extends State<PosScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Kembalian'),
+                                Text('Kembalian', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                                 Text(currencyFormatter.format(change), style: TextStyle(fontWeight: FontWeight.bold, color: cashAmount >= provider.cartTotal ? Colors.green : Colors.red)),
                               ],
                             ),
@@ -566,12 +573,12 @@ class _PosScreenState extends State<PosScreen> {
                           if (paymentMethod == 'QRIS') ...[
                             Container(
                               padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12)),
+                              decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12)),
                               child: Column(
                                 children: [
                                   Image.network('https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=KASIRKU-${provider.cartTotal}', height: 120),
                                   const SizedBox(height: 8),
-                                  const Text('Scan QRIS Kasirku', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
+                                  Text('Scan QRIS Kasirku', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
                                 ],
                               ),
                             ),
@@ -580,13 +587,13 @@ class _PosScreenState extends State<PosScreen> {
                           if (paymentMethod == 'Kartu') ...[
                              Container(
                                padding: const EdgeInsets.all(16),
-                               decoration: BoxDecoration(color: const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12)),
+                               decoration: BoxDecoration(color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(12)),
                                child: Column(
                                  children: [
-                                   const Icon(Icons.photo_camera, size: 48, color: Color(0xFF0D47A1)),
+                                   Icon(Icons.photo_camera, size: 48, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
                                    const SizedBox(height: 8),
-                                   const Text('Foto HP Pelanggan / Bukti Transaksi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                   const Text('Cukup foto layar HP / struk EDC pelanggan untuk verifikasi kartu debit', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                   Text('Foto HP Pelanggan / Bukti Transaksi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: isDark ? Colors.white70 : Colors.black87)),
+                                   Text('Cukup foto layar HP / struk EDC pelanggan untuk verifikasi kartu debit', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
                                    const SizedBox(height: 12),
                                    if (proofPhotoBase64 != null)
                                      Stack(
@@ -608,13 +615,7 @@ class _PosScreenState extends State<PosScreen> {
                                      ElevatedButton.icon(
                                        onPressed: () async {
                                          final picker = ImagePicker();
-                                         // Optimized Image Picking
-                                         final photo = await picker.pickImage(
-                                           source: ImageSource.camera,
-                                           maxWidth: 600,
-                                           maxHeight: 600,
-                                           imageQuality: 60,
-                                         );
+                                         final photo = await picker.pickImage(source: ImageSource.camera, maxWidth: 600, imageQuality: 60);
                                          if (photo != null) {
                                            final bytes = await photo.readAsBytes();
                                            setDialogState(() => proofPhotoBase64 = base64Encode(bytes));
@@ -659,23 +660,23 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  Widget _buildMethodBtn(String label, IconData icon, String active, Function(String) onSelect) {
-    bool isSelected = label == active || (label == 'Kartu' && active == 'Kartu');
+  Widget _buildMethodBtn(String label, IconData icon, String active, Function(String) onSelect, bool isDark) {
+    bool isSelected = label == active;
     return Expanded(
       child: InkWell(
         onTap: () => onSelect(label),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF0D47A1) : Colors.white,
-            border: Border.all(color: isSelected ? const Color(0xFF0D47A1) : Colors.grey.shade300),
+            color: isSelected ? const Color(0xFF0D47A1) : (isDark ? Colors.white.withOpacity(0.05) : Colors.white),
+            border: Border.all(color: isSelected ? const Color(0xFF0D47A1) : (isDark ? Colors.white10 : Colors.grey.shade300)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
-              Icon(icon, color: isSelected ? Colors.white : Colors.grey, size: 20),
+              Icon(icon, color: isSelected ? Colors.white : (isDark ? Colors.white38 : Colors.grey), size: 20),
               const SizedBox(height: 4),
-              Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+              Text(label, style: TextStyle(color: isSelected ? Colors.white : (isDark ? Colors.white38 : Colors.grey), fontSize: 10, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -685,10 +686,12 @@ class _PosScreenState extends State<PosScreen> {
 
   void _showSuccessReceipt(BuildContext context, TransactionModel trx, PosProvider provider, double paidAmount) {
     final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final isDark = provider.isDarkMode;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9, maxWidth: 400),
@@ -702,8 +705,8 @@ class _PosScreenState extends State<PosScreen> {
                 child: const Icon(Icons.check_circle, color: Colors.green, size: 40),
               ),
               const SizedBox(height: 12),
-              const Text('Transaksi Berhasil!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              Text(trx.invoiceNumber, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+              Text('Transaksi Berhasil!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+              Text(trx.invoiceNumber, style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey)),
               const SizedBox(height: 16),
 
               Flexible(
@@ -711,7 +714,7 @@ class _PosScreenState extends State<PosScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Paper Receipt Simulation (Matching React layout)
+                      // Paper Receipt Simulation
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -725,26 +728,20 @@ class _PosScreenState extends State<PosScreen> {
                             Text(provider.storeProfile.name.toUpperCase(), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black)),
                             Text(provider.storeProfile.address, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
                             Text('Telp: ${provider.storeProfile.phone}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
-                            ),
+                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('No: ${trx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
-                                  Text('Kasir: ${trx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
-                                  Text('Waktu: ${trx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
-                                  Text('Metode: ${trx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10)),
+                                  Text('No: ${trx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                  Text('Kasir: ${trx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                  Text('Waktu: ${trx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
+                                  Text('Metode: ${trx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black)),
                                 ],
                               ),
                             ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
-                            ),
+                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
                             ...trx.items.map((item) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2),
                               child: Column(
@@ -753,27 +750,21 @@ class _PosScreenState extends State<PosScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold))),
-                                      Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold)),
+                                      Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black))),
+                                      Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
                                     ],
                                   ),
                                   Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
                                 ],
                               ),
                             )),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
-                            ),
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12)), Text(currencyFormatter.format(trx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12))]),
+                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOTAL', style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black)), Text(currencyFormatter.format(trx.total), style: GoogleFonts.sourceCodePro(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))]),
                             if (trx.paymentMethod == 'Tunai') ...[
                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TUNAI', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(paidAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('KEMBALI', style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54)), Text(currencyFormatter.format(trx.changeAmount), style: GoogleFonts.sourceCodePro(fontSize: 10, color: Colors.black54))]),
                             ],
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38)),
-                            ),
+                            const Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('--------------------------------', style: TextStyle(letterSpacing: 2, color: Colors.black38))),
                             Text(provider.footerMessage, style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54), textAlign: TextAlign.center),
                           ],
                         ),
@@ -788,9 +779,7 @@ class _PosScreenState extends State<PosScreen> {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () {
-                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mencetak struk...')));
-                      },
+                      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mencetak struk...'))),
                       icon: const Icon(Icons.print, size: 16),
                       label: const Text('Cetak'),
                       style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size.fromHeight(48)),

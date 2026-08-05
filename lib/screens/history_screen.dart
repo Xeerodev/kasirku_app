@@ -18,6 +18,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
+    final isDark = provider.isDarkMode;
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
@@ -31,7 +32,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: provider.isDarkMode ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
+      backgroundColor: isDark ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -41,16 +42,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
             const SizedBox(height: 20),
             Row(
               children: [
-                const Icon(Icons.history, color: Color(0xFF0D47A1), size: 32),
+                Icon(Icons.history, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), size: 32),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Riwayat Transaksi',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: provider.isDarkMode ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
                     ),
-                    const Text('Daftar seluruh transaksi penjualan toko', style: TextStyle(fontSize: 12, color: Color(0xFF45464D))),
+                    Text('Daftar seluruh transaksi penjualan toko', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : const Color(0xFF45464D))),
                   ],
                 ),
               ],
@@ -61,20 +62,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Container(
               height: 52,
               decoration: BoxDecoration(
-                color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+                color: isDark ? const Color(0xFF12253C) : Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black.withOpacity(0.05)),
+                border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 2))],
               ),
               child: TextField(
                 onChanged: (val) => setState(() => _searchQuery = val),
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
                   hintText: 'Cari no. faktur atau metode...',
-                  hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  hintStyle: TextStyle(fontSize: 14, color: isDark ? Colors.white38 : Colors.grey),
+                  prefixIcon: Icon(Icons.search, color: isDark ? Colors.white38 : Colors.grey),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                  suffixIcon: _searchQuery.isNotEmpty ? IconButton(icon: const Icon(Icons.close, size: 18), onPressed: () => setState(() => _searchQuery = '')) : null,
+                  suffixIcon: _searchQuery.isNotEmpty ? IconButton(icon: Icon(Icons.close, size: 18, color: isDark ? Colors.white38 : Colors.grey), onPressed: () => setState(() => _searchQuery = '')) : null,
                 ),
               ),
             ),
@@ -83,20 +85,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
             // List
             Container(
               decoration: BoxDecoration(
-                color: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
+                color: isDark ? const Color(0xFF12253C) : Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.black.withOpacity(0.05)),
+                border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
               ),
               child: filteredTransactions.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.all(48.0),
+                  ? Padding(
+                      padding: const EdgeInsets.all(48.0),
                       child: Center(
                         child: Column(
                           children: [
-                            Icon(Icons.receipt_long, size: 48, color: Colors.grey),
-                            SizedBox(height: 12),
-                            Text('Belum ada riwayat transaksi', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Icon(Icons.receipt_long, size: 48, color: isDark ? Colors.white10 : Colors.grey),
+                            const SizedBox(height: 12),
+                            Text('Belum ada riwayat transaksi', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                           ],
                         ),
                       ),
@@ -105,7 +107,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: filteredTransactions.length,
-                      separatorBuilder: (context, index) => const Divider(height: 1),
+                      separatorBuilder: (context, index) => Divider(height: 1, color: isDark ? Colors.white10 : Colors.grey.shade200),
                       itemBuilder: (context, index) {
                         final tx = filteredTransactions[index];
                         final isRefunded = tx.status == 'Refund';
@@ -122,31 +124,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(tx.invoiceNumber, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF0D47A1), decoration: isRefunded ? TextDecoration.lineThrough : null)),
+                                          Text(tx.invoiceNumber, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), decoration: isRefunded ? TextDecoration.lineThrough : null)),
                                           const SizedBox(width: 8),
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: isRefunded ? const Color(0xFFFFDAD6) : const Color(0xFFE3F2FD),
+                                              color: isRefunded ? const Color(0xFFBA1A1A).withOpacity(0.1) : const Color(0xFFE3F2FD),
                                               borderRadius: BorderRadius.circular(10),
                                             ),
-                                            child: Text(tx.status, style: TextStyle(color: isRefunded ? const Color(0xFF93000A) : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 9)),
+                                            child: Text(tx.status, style: TextStyle(color: isRefunded ? (isDark ? Colors.redAccent : const Color(0xFF93000A)) : const Color(0xFF0D47A1), fontWeight: FontWeight.bold, fontSize: 9)),
                                           ),
                                         ],
                                       ),
                                       const SizedBox(height: 4),
-                                      Text('${tx.timeString} • ${tx.items.length} item (${tx.paymentMethod}) • Kasir: ${tx.cashierName}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                      Text('${tx.timeString} • ${tx.items.length} item (${tx.paymentMethod}) • Kasir: ${tx.cashierName}', style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.grey)),
                                     ],
                                   ),
                                 ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(currencyFormatter.format(tx.total), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isRefunded ? Colors.grey : Colors.black87)),
-                                    const Row(
+                                    Text(currencyFormatter.format(tx.total), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isRefunded ? (isDark ? Colors.white10 : Colors.grey) : (isDark ? Colors.white : Colors.black87))),
+                                    Row(
                                       children: [
-                                        Text('Klik detail', style: TextStyle(fontSize: 9, color: Colors.grey)),
-                                        Icon(Icons.chevron_right, size: 14, color: Colors.grey),
+                                        Text('Klik detail', style: TextStyle(fontSize: 9, color: isDark ? Colors.white38 : Colors.grey)),
+                                        Icon(Icons.chevron_right, size: 14, color: isDark ? Colors.white38 : Colors.grey),
                                       ],
                                     ),
                                   ],
@@ -167,10 +169,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _showTransactionDetail(BuildContext context, TransactionModel tx, PosProvider provider) {
     final currencyFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final isDark = provider.isDarkMode;
 
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
+        backgroundColor: isDark ? const Color(0xFF12253C) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
         child: Container(
           width: double.infinity,
@@ -184,14 +188,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Detail Faktur', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
-                    IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close)),
+                    Text('Detail Faktur', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1))),
+                    IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.black54)),
                   ],
                 ),
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Paper Receipt Simulation (Matching React layout)
+                // Paper Receipt Simulation
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -210,10 +214,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('No: ${tx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 9)), Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))]),
-                            Text('Kasir: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9)),
-                            Text('Waktu: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9)),
-                            Text('Metode: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9)),
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('No: ${tx.invoiceNumber}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)), Text(tx.status, style: GoogleFonts.sourceCodePro(fontSize: 9, fontWeight: FontWeight.bold, color: tx.status == 'Refund' ? Colors.red : Colors.green))]),
+                            Text('Kasir: ${tx.cashierName}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                            Text('Waktu: ${tx.timeString}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
+                            Text('Metode: ${tx.paymentMethod}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black)),
                           ],
                         ),
                       ),
@@ -226,8 +230,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold))),
-                                Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold)),
+                                Expanded(child: Text(item.product.name, style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black))),
+                                Text(currencyFormatter.format(item.subtotal), style: GoogleFonts.sourceCodePro(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black)),
                               ],
                             ),
                             Text('   ${item.quantity} x ${currencyFormatter.format(item.product.price).replaceAll('Rp ', '')}', style: GoogleFonts.sourceCodePro(fontSize: 9, color: Colors.black54)),
@@ -250,7 +254,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mencetak struk...')));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mencetak struk...'), behavior: SnackBarBehavior.floating));
                         },
                         icon: const Icon(Icons.print, size: 16),
                         label: const Text('Cetak Struk', style: TextStyle(fontSize: 12)),

@@ -74,8 +74,8 @@ class PosProvider with ChangeNotifier {
     logoUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
     isConfigured: false,
   );
-  bool _isDarkMode = false;
   bool _isLoggedIn = false;
+  String _adminPassword = '123456';
 
   // Settings matching React
   String _activePrinter = 'Epson TM-T82X (USB)';
@@ -89,6 +89,7 @@ class PosProvider with ChangeNotifier {
   StoreProfile get storeProfile => _storeProfile;
   bool get isDarkMode => _isDarkMode;
   bool get isLoggedIn => _isLoggedIn;
+  String get adminPassword => _adminPassword;
 
   String get activePrinter => _activePrinter;
   bool get autoPrintReceipt => _autoPrintReceipt;
@@ -121,6 +122,12 @@ class PosProvider with ChangeNotifier {
 
   void login() {
     _isLoggedIn = true;
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  void updatePassword(String newPass) {
+    _adminPassword = newPass;
     _saveToPrefs();
     notifyListeners();
   }
@@ -294,6 +301,7 @@ class PosProvider with ChangeNotifier {
     prefs.setBool('autoPrintReceipt', _autoPrintReceipt);
     prefs.setString('footerMessage', _footerMessage);
     prefs.setString('language', _language);
+    prefs.setString('adminPassword', _adminPassword);
   }
 
   Future<void> _loadFromPrefs() async {
@@ -304,6 +312,7 @@ class PosProvider with ChangeNotifier {
     _autoPrintReceipt = prefs.getBool('autoPrintReceipt') ?? true;
     _footerMessage = prefs.getString('footerMessage') ?? 'Terima kasih atas kunjungan Anda!\nBarang yang sudah dibeli tidak dapat ditukar.';
     _language = prefs.getString('language') ?? 'Indonesia';
+    _adminPassword = prefs.getString('adminPassword') ?? '123456';
 
     final storeStr = prefs.getString('storeProfile');
     if (storeStr != null) {
