@@ -37,7 +37,7 @@ flutter run -d windows
 ```
 
 ## Kontribusi
-Proyek ini dikembangkan sebagai tugas UAS Semester 6 oleh **Xeerodev**.
+Proyek ini dikembangkan sebagai tugas UAS Semester 6 Materi Rekayasa Perangkat Lunak oleh **Xeerodev**.
 
 ---
 *Dibuat dengan ❤️ untuk kemajuan UMKM Indonesia.*
