@@ -40,7 +40,7 @@ class _KasirkuAppState extends State<KasirkuApp> {
     }
 
     return MaterialApp(
-      title: 'Kasirku POS',
+      title: 'Kasirku - developed by Xeerodev',
       debugShowCheckedModeBanner: false,
       themeMode: provider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
