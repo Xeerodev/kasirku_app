@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/pos_provider.dart';
 
@@ -12,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController(text: 'kasirku_admin');
   final _passwordController = TextEditingController(text: '123456');
+  bool _isPasswordVisible = false;
 
   void _handleContactDev() async {
     final url = Uri.parse('https://wa.me/6283164004093?text=Halo%20Developer%20Kasirku');
@@ -92,6 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _usernameController,
+                        style: const TextStyle(color: Colors.black87),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
                           hintText: 'Masukkan username',
@@ -105,9 +109,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
+                        style: const TextStyle(color: Colors.black87),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                              color: Colors.grey,
+                              size: 20,
+                            ),
+                            onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                          ),
                           hintText: 'Masukkan password',
                           filled: true,
                           fillColor: const Color(0xFFF8F9FF),
@@ -139,9 +152,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text(
+                              'Login',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
                             SizedBox(width: 8),
-                            Icon(Icons.login),
+                            Icon(Icons.login, color: Colors.white),
                           ],
                         ),
                       ),
