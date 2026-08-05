@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/pos_provider.dart';
+import '../models/store_profile.dart';
 import '../services/export_service.dart';
 
 class ReportsScreen extends StatefulWidget {

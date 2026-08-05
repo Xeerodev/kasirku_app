@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/pos_provider.dart';
 import '../models/product.dart';
 import '../models/transaction.dart';
+import '../models/store_profile.dart';
 import '../services/printer_service.dart';
 
 class PosScreen extends StatefulWidget {
