@@ -1,6 +1,6 @@
 {
-    "name": "kasirku_pos",
-    "short_name": "kasirku_pos",
+    "name": "Kasirku App",
+    "short_name": "Kasirku App",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

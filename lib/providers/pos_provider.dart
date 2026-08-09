@@ -7,70 +7,15 @@ import '../models/transaction.dart';
 import '../models/store_profile.dart';
 
 class PosProvider with ChangeNotifier {
-  List<Product> _products = [
-    Product(
-      id: 'p1',
-      name: 'Latte',
-      category: 'Kopi',
-      price: 45000,
-      stock: 15,
-      image: 'assets/images/latte.jpg',
-      description: 'Espresso creamy dengan susu segar berkualitas tinggi dan seni latte foam',
-    ),
-    Product(
-      id: 'p2',
-      name: 'Butter Croissant',
-      category: 'Kue',
-      price: 37500,
-      stock: 8,
-      image: 'assets/images/croissant.jpg',
-      description: 'Roti croissant mentega Prancis renyah di luar, lembut berlapis di dalam',
-    ),
-    Product(
-      id: 'p3',
-      name: 'Iced Americano',
-      category: 'Kopi',
-      price: 35000,
-      stock: 20,
-      image: 'assets/images/americano.jpg',
-      description: 'Double shot espresso dingin segar disajikan dengan es batu',
-    ),
-    Product(
-      id: 'p4',
-      name: 'Chocolate Chip Cookie',
-      category: 'Kue',
-      price: 25000,
-      stock: 0,
-      image: '',
-      description: 'Kue kering cokelat lezat beraroma mentega',
-    ),
-    Product(
-      id: 'p5',
-      name: 'Campuran Espresso Artisan',
-      category: 'Biji Kopi',
-      price: 280000,
-      stock: 45,
-      image: 'assets/images/coffee_beans.jpg',
-      description: 'Biji kopi pilihan roasted segar dengan nota rasa cokelat dan kacang',
-    ),
-    Product(
-      id: 'p6',
-      name: 'Mug Keramik Pour-over',
-      category: 'Merchandise',
-      price: 180000,
-      stock: 2,
-      image: 'assets/images/mug.jpg',
-      description: 'Mug keramik buatan tangan estetis untuk penyeduhan manual',
-    ),
-  ];
+  List<Product> _products = [];
 
   final List<CartItem> _cart = [];
   List<TransactionModel> _transactions = [];
   StoreProfile _storeProfile = StoreProfile(
-    name: 'Toko Kopi Senja',
-    address: 'Jl. Sudirman No. 123, Jakarta Selatan',
-    phone: '0812-3456-7890',
-    cashierName: 'Ahmad (Kasir 1)',
+    name: '',
+    address: '',
+    phone: '',
+    cashierName: '',
     logoUrl: 'assets/images/logo.png',
     isConfigured: false,
   );
@@ -113,23 +58,17 @@ class PosProvider with ChangeNotifier {
       ..sort((a, b) => b.value.compareTo(a.value));
     
     final topEntry = sortedEntries.first;
-    final product = _products.firstWhere((p) => p.name == topEntry.key, orElse: () => _products.first);
+    final productIndex = _products.indexWhere((p) => p.name == topEntry.key);
     
     return {
       'name': topEntry.key,
       'sold': topEntry.value,
-      'image': product.image,
+      'image': productIndex >= 0 ? _products[productIndex].image : 'assets/images/logo.png',
     };
   }
 
   List<String> get existingCategories {
-    final categories = _products.map((p) => p.category).toSet().toList();
-    for (var defaultCat in ['Kopi', 'Kue', 'Merchandise', 'Biji Kopi', 'Teh', 'Minuman']) {
-      if (!categories.contains(defaultCat)) {
-        categories.add(defaultCat);
-      }
-    }
-    return categories;
+    return _products.map((p) => p.category).toSet().toList();
   }
 
   // Translation Map
@@ -489,28 +428,7 @@ class PosProvider with ChangeNotifier {
       final List list = jsonDecode(trxStr);
       _transactions = list.map((item) => TransactionModel.fromJson(item)).toList();
     } else {
-      // Add initial transactions from React data
-      _transactions = [
-        TransactionModel(
-          id: 'tx-142',
-          invoiceNumber: 'INV-20231024-142',
-          date: DateTime.now().subtract(const Duration(minutes: 5)),
-          timeString: '14:32',
-          items: [
-            CartItem(product: _products[0], quantity: 1),
-            CartItem(product: _products[2], quantity: 1),
-          ],
-          subtotal: 80000,
-          tax: 0,
-          discount: 0,
-          total: 80000,
-          paymentAmount: 100000,
-          changeAmount: 20000,
-          paymentMethod: 'QRIS',
-          cashierName: 'Ahmad (Kasir 1)',
-          status: 'Lunas',
-        ),
-      ];
+      _transactions = [];
     }
     notifyListeners();
   }

@@ -78,7 +78,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                           ),
                           const SizedBox(height: 12),
                           const Text(
-                            'Kelola inventaris, lacak penjualan, dan kembangkan bisnis Anda dengan Kasirku POS.',
+                            'Kelola inventaris, lacak penjualan, dan kembangkan bisnis Anda dengan Kasirku App.',
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 14, color: Color(0xFF45464D), height: 1.5),
                           ),

@@ -22,7 +22,7 @@ class KasirkuApp extends StatefulWidget {
 }
 
 class _KasirkuAppState extends State<KasirkuApp> {
-  String _currentAuthView = 'login'; // 'login' or 'setup'
+  String? _currentAuthView; // null means auto-decide
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,10 @@ class _KasirkuAppState extends State<KasirkuApp> {
 
     Widget home;
     if (!provider.isLoggedIn) {
-      if (_currentAuthView == 'setup') {
+      // If store is not configured, prioritize Setup screen
+      final view = _currentAuthView ?? (provider.storeProfile.isConfigured ? 'login' : 'setup');
+      
+      if (view == 'setup') {
         home = SetupStoreScreen(onSwitchToLogin: () => setState(() => _currentAuthView = 'login'));
       } else {
         home = LoginScreen(onSwitchToSetup: () => setState(() => _currentAuthView = 'setup'));
@@ -40,7 +43,7 @@ class _KasirkuAppState extends State<KasirkuApp> {
     }
 
     return MaterialApp(
-      title: 'Kasirku - developed by Xeerodev',
+      title: 'Kasirku App - developed by Xeerodev',
       debugShowCheckedModeBanner: false,
       themeMode: provider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(

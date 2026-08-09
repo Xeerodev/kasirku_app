@@ -28,10 +28,10 @@ class StoreProfile {
 
   factory StoreProfile.fromJson(Map<String, dynamic> json) {
     return StoreProfile(
-      name: json['name'] ?? 'Kasirku Store',
-      address: json['address'] ?? 'Jl. Merdeka No. 45, Jakarta',
-      phone: json['phone'] ?? '0812-3456-7890',
-      cashierName: json['cashierName'] ?? 'Kasir Utama',
+      name: json['name'] ?? '',
+      address: json['address'] ?? '',
+      phone: json['phone'] ?? '',
+      cashierName: json['cashierName'] ?? '',
       logoUrl: json['logoUrl'] ?? '',
       isConfigured: json['isConfigured'] ?? false,
     );

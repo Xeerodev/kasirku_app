@@ -258,8 +258,8 @@ class _StockScreenState extends State<StockScreen> {
     final priceCtrl = TextEditingController(text: productToEdit?.price.toInt().toString() ?? '');
     final stockCtrl = TextEditingController(text: productToEdit?.stock.toString() ?? '');
     final descCtrl = TextEditingController(text: productToEdit?.description ?? '');
-    String selectedCat = productToEdit?.category ?? 'Kopi';
-    bool isCustom = !provider.existingCategories.contains(selectedCat);
+    String selectedCat = productToEdit?.category ?? '';
+    bool isCustom = productToEdit == null ? provider.existingCategories.isEmpty : !provider.existingCategories.contains(selectedCat);
     String imageBase64 = productToEdit?.image ?? '';
     final lang = provider.language;
     final width = MediaQuery.of(context).size.width;
@@ -302,13 +302,21 @@ class _StockScreenState extends State<StockScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildLabel(provider.tr('category'), provider.isDarkMode),
-                        TextButton(
-                          onPressed: () => setDialogState(() => isCustom = !isCustom),
-                          child: Text(isCustom ? (lang == 'Indonesia' ? 'Pilih dari Daftar' : 'Choose from List') : (lang == 'Indonesia' ? '+ Ketik Manual' : '+ Type Manual'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                        ),
+                        if (provider.existingCategories.isNotEmpty)
+                          TextButton(
+                            onPressed: () {
+                              setDialogState(() {
+                                isCustom = !isCustom;
+                                if (!isCustom && (selectedCat.isEmpty || !provider.existingCategories.contains(selectedCat))) {
+                                  selectedCat = provider.existingCategories.first;
+                                }
+                              });
+                            },
+                            child: Text(isCustom ? (lang == 'Indonesia' ? 'Pilih dari Daftar' : 'Choose from List') : (lang == 'Indonesia' ? '+ Ketik Manual' : '+ Type Manual'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          ),
                       ],
                     ),
-                    if (!isCustom)
+                    if (!isCustom && provider.existingCategories.isNotEmpty)
                       DropdownButtonFormField<String>(
                         dropdownColor: provider.isDarkMode ? const Color(0xFF12253C) : Colors.white,
                         value: provider.existingCategories.contains(selectedCat) ? selectedCat : provider.existingCategories.first,
@@ -319,6 +327,7 @@ class _StockScreenState extends State<StockScreen> {
                       )
                     else
                       TextFormField(
+                        initialValue: selectedCat,
                         onChanged: (v) => selectedCat = v,
                         style: TextStyle(color: provider.isDarkMode ? Colors.white : Colors.black87),
                         decoration: _inputDeco(lang == 'Indonesia' ? 'Tulis nama kategori baru...' : 'Type new category name...'),

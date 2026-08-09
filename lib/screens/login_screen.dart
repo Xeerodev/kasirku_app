@@ -12,8 +12,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController(text: 'kasirku_admin');
-  final _passwordController = TextEditingController(text: '123456');
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
   void _handleContactDev() async {
@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 24),
                       const Text(
-                        'Masuk ke Kasirku',
+                        'Masuk ke Kasirku App',
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0B1C30)),
                       ),
                       const SizedBox(height: 8),
