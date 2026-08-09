@@ -367,9 +367,38 @@ class PosProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateStoreProfile(StoreProfile profile) {
+  void updateStoreProfile(StoreProfile profile, {String? password}) {
+    // If we are configuring for the first time or re-configuring, 
+    // we should ensure a clean slate if profile.isConfigured is true
+    if (profile.isConfigured) {
+      _products = [];
+      _transactions = [];
+      _cart.clear();
+    }
+    
     _storeProfile = profile;
+    if (password != null) _adminPassword = password;
     _saveToPrefs();
+    notifyListeners();
+  }
+
+  Future<void> resetAllData() async {
+    _products = [];
+    _transactions = [];
+    _cart.clear();
+    _storeProfile = StoreProfile(
+      name: '',
+      address: '',
+      phone: '',
+      cashierName: '',
+      logoUrl: 'assets/images/logo.png',
+      isConfigured: false,
+    );
+    _adminPassword = '123456';
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Wipe everything in storage
+    
     notifyListeners();
   }
 

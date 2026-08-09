@@ -91,14 +91,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Username', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0B1C30))),
+                      const Text('Nama Kasir', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0B1C30))),
                       const SizedBox(height: 8),
                       TextField(
                         controller: _usernameController,
                         style: const TextStyle(color: Colors.black87),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
-                          hintText: 'Masukkan username',
+                          hintText: 'Masukkan nama kasir sesuai pendaftaran',
                           filled: true,
                           fillColor: const Color(0xFFF8F9FF),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.black.withOpacity(0.1))),
@@ -130,12 +130,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 32),
                       ElevatedButton(
                         onPressed: () {
-                          if (_passwordController.text == provider.adminPassword) {
+                          final inputName = _usernameController.text.trim();
+                          final inputPass = _passwordController.text;
+                          
+                          if (inputName.toLowerCase() == provider.storeProfile.cashierName.toLowerCase() && 
+                              inputPass == provider.adminPassword) {
                             provider.login();
                           } else {
+                            String error = 'Nama Kasir atau Password salah!';
+                            if (inputName.isEmpty || inputPass.isEmpty) {
+                              error = 'Harap isi semua kolom!';
+                            }
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Password salah!'),
+                              SnackBar(
+                                content: Text(error),
                                 backgroundColor: Colors.red,
                                 behavior: SnackBarBehavior.floating,
                               ),
@@ -166,7 +174,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           TextButton(
-                            onPressed: widget.onSwitchToSetup,
+                            onPressed: () {
+                              // Reset all data before starting a new setup to ensure no stale data
+                              provider.resetAllData();
+                              widget.onSwitchToSetup();
+                            },
                             child: const Text('Atur Toko Baru', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
                           ),
                           TextButton(

@@ -17,6 +17,9 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _cashierController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
   String _logoBase64 = '';
   final String _defaultLogoUrl = 'assets/images/logo.png';
 
@@ -191,6 +194,10 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                       _buildLabelField('Alamat Toko', Icons.location_on, _addressController, 'Alamat jalan lengkap'),
                       const SizedBox(height: 16),
                       _buildLabelField('Nomor HP', Icons.call, _phoneController, 'cth. 081234567890'),
+                      const SizedBox(height: 16),
+                      _buildLabelField('Nama Kasir', Icons.person, _cashierController, 'Nama Anda sebagai kasir'),
+                      const SizedBox(height: 16),
+                      _buildLabelField('Kata Sandi Kasir', Icons.lock, _passwordController, 'Minimal 6 karakter', isPassword: true),
 
                       const SizedBox(height: 32),
                       ElevatedButton(
@@ -199,14 +206,26 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nama toko wajib diisi!'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
                             return;
                           }
-                          provider.updateStoreProfile(StoreProfile(
-                            name: _nameController.text,
-                            address: _addressController.text,
-                            phone: _phoneController.text,
-                            cashierName: 'Kasir Utama',
-                            logoUrl: _logoBase64.isEmpty ? _defaultLogoUrl : _logoBase64,
-                            isConfigured: true,
-                          ));
+                          if (_cashierController.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nama kasir wajib diisi!'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
+                            return;
+                          }
+                          if (_passwordController.text.length < 4) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kata sandi terlalu pendek!'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
+                            return;
+                          }
+                          
+                          provider.updateStoreProfile(
+                            StoreProfile(
+                              name: _nameController.text,
+                              address: _addressController.text,
+                              phone: _phoneController.text,
+                              cashierName: _cashierController.text,
+                              logoUrl: _logoBase64.isEmpty ? _defaultLogoUrl : _logoBase64,
+                              isConfigured: true,
+                            ),
+                            password: _passwordController.text,
+                          );
                           provider.login();
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(56), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)), elevation: 4),
@@ -250,7 +269,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
     );
   }
 
-  Widget _buildLabelField(String label, IconData icon, TextEditingController controller, String hint, {int maxLines = 1}) {
+  Widget _buildLabelField(String label, IconData icon, TextEditingController controller, String hint, {int maxLines = 1, bool isPassword = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -259,9 +278,16 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
         TextField(
           controller: controller,
           maxLines: maxLines,
+          obscureText: isPassword && !_isPasswordVisible,
           style: const TextStyle(fontSize: 14, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: const Color(0xFF2196F3), size: 20),
+            suffixIcon: isPassword 
+              ? IconButton(
+                  icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.grey, size: 20),
+                  onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                )
+              : null,
             hintText: hint,
             hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
             filled: true,
