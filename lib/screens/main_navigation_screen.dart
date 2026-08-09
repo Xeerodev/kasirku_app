@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/pos_provider.dart';
@@ -84,11 +85,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.black12),
-                    image: const DecorationImage(
-                      image: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg'),
-                      fit: BoxFit.contain,
-                    ),
+                    image: provider.storeProfile.logoUrl.isEmpty
+                      ? null
+                      : provider.storeProfile.logoUrl.startsWith('assets/')
+                        ? DecorationImage(image: AssetImage(provider.storeProfile.logoUrl), fit: BoxFit.contain)
+                        : provider.storeProfile.logoUrl.startsWith('http')
+                          ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.contain)
+                          : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.contain),
                   ),
+                  child: provider.storeProfile.logoUrl.isEmpty ? const Icon(Icons.store, size: 20) : null,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

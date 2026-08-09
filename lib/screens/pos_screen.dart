@@ -92,9 +92,11 @@ class _PosScreenState extends State<PosScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.blue.withOpacity(0.4)),
-                          image: provider.storeProfile.logoUrl.startsWith('http')
-                            ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
-                            : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover),
+                          image: provider.storeProfile.logoUrl.startsWith('assets/')
+                            ? DecorationImage(image: AssetImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                            : provider.storeProfile.logoUrl.startsWith('http')
+                              ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                              : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover),
                         ),
                       )
                     else
@@ -232,9 +234,11 @@ class _PosScreenState extends State<PosScreen> {
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                     child: product.image.isNotEmpty
-                        ? (product.image.startsWith('http')
-                            ? Image.network(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
-                            : Image.memory(base64Decode(product.image), fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null))
+                        ? (product.image.startsWith('assets/')
+                            ? Image.asset(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
+                            : product.image.startsWith('http')
+                              ? Image.network(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
+                              : Image.memory(base64Decode(product.image), fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null))
                         : Icon(Icons.local_cafe, size: 40, color: isDark ? Colors.white10 : Colors.grey),
                   ),
                 ),
@@ -407,9 +411,11 @@ class _PosScreenState extends State<PosScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: item.product.image.isNotEmpty
-                            ? (item.product.image.startsWith('http')
-                                ? Image.network(item.product.image, fit: BoxFit.cover)
-                                : Image.memory(base64Decode(item.product.image), fit: BoxFit.cover))
+                            ? (item.product.image.startsWith('assets/')
+                                ? Image.asset(item.product.image, fit: BoxFit.cover)
+                                : item.product.image.startsWith('http')
+                                  ? Image.network(item.product.image, fit: BoxFit.cover)
+                                  : Image.memory(base64Decode(item.product.image), fit: BoxFit.cover))
                             : Icon(Icons.image, color: isDark ? Colors.white10 : Colors.grey),
                       ),
                     ),

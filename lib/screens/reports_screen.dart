@@ -51,9 +51,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    image: provider.storeProfile.logoUrl.startsWith('http')
-                      ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
-                      : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover)
+                    image: provider.storeProfile.logoUrl.startsWith('assets/')
+                      ? DecorationImage(image: AssetImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                      : provider.storeProfile.logoUrl.startsWith('http')
+                        ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                        : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover),
                   ),
                 ),
               ),
@@ -302,6 +304,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   Widget _buildTopProductCard(PosProvider provider, NumberFormat currencyFormatter) {
     final isDark = provider.isDarkMode;
+    final topProduct = provider.topProduct;
+    final String productName = topProduct?['name'] ?? (provider.language == 'Indonesia' ? 'Belum Ada' : 'None');
+    final String productSold = topProduct != null ? '${topProduct['sold']} ${provider.language == 'Indonesia' ? 'porsi' : 'servings'}' : '-';
+    final String? productImage = topProduct?['image'];
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -321,18 +328,33 @@ class _ReportsScreenState extends State<ReportsScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Text('Latte', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(productName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87), maxLines: 1, overflow: TextOverflow.ellipsis),
           const Spacer(),
           Row(
             children: [
-              Container(width: 40, height: 40, decoration: BoxDecoration(color: isDark ? Colors.white10 : const Color(0xFFF5FAFF), borderRadius: BorderRadius.circular(10)), child: Icon(Icons.image, color: isDark ? Colors.white24 : Colors.grey, size: 20)),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white10 : const Color(0xFFF5FAFF),
+                  borderRadius: BorderRadius.circular(10),
+                  image: productImage != null && productImage.isNotEmpty
+                    ? (productImage.startsWith('assets/')
+                      ? DecorationImage(image: AssetImage(productImage), fit: BoxFit.cover)
+                      : DecorationImage(image: NetworkImage(productImage), fit: BoxFit.cover))
+                    : null,
+                ),
+                child: productImage == null || productImage.isEmpty
+                  ? Icon(Icons.image, color: isDark ? Colors.white24 : Colors.grey, size: 20)
+                  : null,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(provider.language == 'Indonesia' ? 'Total Terjual' : 'Total Sold', style: TextStyle(fontSize: 10, color: isDark ? Colors.white38 : Colors.grey), overflow: TextOverflow.ellipsis),
-                    Text('48 ${provider.language == 'Indonesia' ? 'porsi' : 'servings'}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : Colors.blue.shade700), overflow: TextOverflow.ellipsis),
+                    Text(productSold, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : Colors.blue.shade700), overflow: TextOverflow.ellipsis),
                   ],
                 ),
               )

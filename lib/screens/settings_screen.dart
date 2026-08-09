@@ -262,9 +262,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.1)),
                               image: provider.storeProfile.logoUrl.isNotEmpty
-                                ? (provider.storeProfile.logoUrl.startsWith('http')
-                                    ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
-                                    : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover))
+                                ? (provider.storeProfile.logoUrl.startsWith('assets/')
+                                    ? DecorationImage(image: AssetImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                                    : provider.storeProfile.logoUrl.startsWith('http')
+                                      ? DecorationImage(image: NetworkImage(provider.storeProfile.logoUrl), fit: BoxFit.cover)
+                                      : DecorationImage(image: MemoryImage(base64Decode(provider.storeProfile.logoUrl)), fit: BoxFit.cover))
                                 : null,
                             ),
                             child: provider.storeProfile.logoUrl.isEmpty ? Icon(Icons.storefront, size: 40, color: isDark ? Colors.white24 : Colors.grey) : null,

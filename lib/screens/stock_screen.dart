@@ -179,9 +179,11 @@ class _StockScreenState extends State<StockScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: product.image.isNotEmpty
-                  ? (product.image.startsWith('http')
-                      ? Image.network(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
-                      : Image.memory(base64Decode(product.image), fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null))
+                  ? (product.image.startsWith('assets/')
+                      ? Image.asset(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
+                      : product.image.startsWith('http')
+                        ? Image.network(product.image, fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null)
+                        : Image.memory(base64Decode(product.image), fit: BoxFit.cover, color: isOutOfStock ? Colors.grey : null, colorBlendMode: isOutOfStock ? BlendMode.saturation : null))
                   : Icon(Icons.inventory, color: isDark ? Colors.white24 : Colors.grey),
             ),
           ),

@@ -14,7 +14,7 @@ class PosProvider with ChangeNotifier {
       category: 'Kopi',
       price: 45000,
       stock: 15,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCD5wP3t-xFQxn5XoghNFgauxPU230h6J8bOnRmzYdAKM24saHAtAGNrrCc0E7w6Ximb9DZbx-GQrGDpRcxGYr7ayA7kJuLv3-47yIlRPFCgDf7BqIyUGqaFMERCvlI0W2GyZ3agi820v5oVazBc4_NUoQ5tVSAVkHWJC1wB2WC6tR33FvTbI2ARX8nSEkhwRwxN79kz5z170wuA2VnTS_ASgiYHBXf_UWbPQnCogaLyvT8EH3gQ3jt',
+      image: 'assets/images/latte.jpg',
       description: 'Espresso creamy dengan susu segar berkualitas tinggi dan seni latte foam',
     ),
     Product(
@@ -23,7 +23,7 @@ class PosProvider with ChangeNotifier {
       category: 'Kue',
       price: 37500,
       stock: 8,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD0bvZcnjyjtHWAyCvb4Z0F_WLrDn5qp0DD-CJa4qY1h0Q0mGsnbnZtNHc5CYD3fsoP8xDbATpRupmhQ5K-j1auHAB9U-91lkczXRrGKuKwWtcDUBwtoR7pZeng_LTEXowm2_ehsRW2dOi6gUK4S3rfjzwkp_zI7cx9IdKeNr71XwKnQxjo45GQ1d7rq9zqCDzXVEFzP3COqyzGgPxsxn_RdR5lGJdyC2K0X9s_0msUPsCpbiT6-C2h',
+      image: 'assets/images/croissant.jpg',
       description: 'Roti croissant mentega Prancis renyah di luar, lembut berlapis di dalam',
     ),
     Product(
@@ -32,7 +32,7 @@ class PosProvider with ChangeNotifier {
       category: 'Kopi',
       price: 35000,
       stock: 20,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBMuOWbl70BCHzw1FsgQQJoZ_U6XcE5bEwZ0WL6G1cmXWe3f_JV5GKHi6kuoFPVv3pFEmUMdxXg2TmXreAEY7-nEE0_8YtSSLGgq0sdDFHca2i-mMVJtyBvVxq-BH5LXCR-keAkPC9iZKRbYH77MZuOR5PHuNgEM3kXZoI4nH7PGhBQf4yAKEvs6lj50cMA-oI2yi9_70ralkKxQgm6l4n3dGknvSCxIAFmbc8DOdGJEG1LujIQwRPC',
+      image: 'assets/images/americano.jpg',
       description: 'Double shot espresso dingin segar disajikan dengan es batu',
     ),
     Product(
@@ -50,7 +50,7 @@ class PosProvider with ChangeNotifier {
       category: 'Biji Kopi',
       price: 280000,
       stock: 45,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBbr6zfbw-PQCu1WBIJFDrU0UNf-qWDHETwwl7IEDXt5scP_mGdtWzblQOLB4Xn57lTy5Daf2MrSiKWPXLpT_rtTsHdrVQgQNwj3pd4euQgqWBcespQVG_Bqf7HYEjpbxVeaO_6FtySpr7Lr2OFoZnzdSKRjDSAQ6K6NDjuh99xQxafNZi_zZn6cDB8CDGqcqXYO2mZFANl-iq4YPoLoGxn8vCSwl_PKAad5VlDbxcVF1IhX_7BWs9P',
+      image: 'assets/images/coffee_beans.jpg',
       description: 'Biji kopi pilihan roasted segar dengan nota rasa cokelat dan kacang',
     ),
     Product(
@@ -59,7 +59,7 @@ class PosProvider with ChangeNotifier {
       category: 'Merchandise',
       price: 180000,
       stock: 2,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBXa_18wnBm7xuaS1fS_jxljlcAODJG3JVz6kjiQskUKIY9p2hdLPQZ9jZYkFCUBpUklZUKtxMlP9PYPWm1NFKx488ohVh-uMbmOXqjA3GTHKC9N4RAolhBMzyGs4zT11liKF7xlu_AJcY--095s8lQZmsNO3HIwz0zNVYpo1Vv_bkmEM2zNyNV6qSnfs-4cgtTexlEHynZiAr6epyn3FbCWS05fqOK3MeLV8oSo6b76NY5Go7oyzzQ',
+      image: 'assets/images/mug.jpg',
       description: 'Mug keramik buatan tangan estetis untuk penyeduhan manual',
     ),
   ];
@@ -71,7 +71,7 @@ class PosProvider with ChangeNotifier {
     address: 'Jl. Sudirman No. 123, Jakarta Selatan',
     phone: '0812-3456-7890',
     cashierName: 'Ahmad (Kasir 1)',
-    logoUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg',
+    logoUrl: 'assets/images/logo.png',
     isConfigured: false,
   );
   bool _isDarkMode = false;
@@ -96,6 +96,31 @@ class PosProvider with ChangeNotifier {
   bool get autoPrintReceipt => _autoPrintReceipt;
   String get footerMessage => _footerMessage;
   String get language => _language;
+
+  Map<String, dynamic>? get topProduct {
+    if (_transactions.isEmpty) return null;
+    
+    final Map<String, int> productSales = {};
+    for (var trx in _transactions.where((t) => t.status == 'Lunas')) {
+      for (var item in trx.items) {
+        productSales[item.product.name] = (productSales[item.product.name] ?? 0) + item.quantity;
+      }
+    }
+    
+    if (productSales.isEmpty) return null;
+    
+    var sortedEntries = productSales.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    
+    final topEntry = sortedEntries.first;
+    final product = _products.firstWhere((p) => p.name == topEntry.key, orElse: () => _products.first);
+    
+    return {
+      'name': topEntry.key,
+      'sold': topEntry.value,
+      'image': product.image,
+    };
+  }
 
   List<String> get existingCategories {
     final categories = _products.map((p) => p.category).toSet().toList();

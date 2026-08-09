@@ -18,7 +18,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
   final _addressController = TextEditingController();
   final _phoneController = TextEditingController();
   String _logoBase64 = '';
-  final String _defaultLogoUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDHsGLOsUm9DlHUA9xeRpCapc2k1euPnzJcmzpRt_wjWQPVJ88L-F49scQ4D_RlATOmxa6YMFv0pCAsI4x-dd6QdWtAB905MfQ3qhy3SOvLTO3cs4m0qbR2VW1p_HjznuBoJlpBAzfz-sdyrHgJPXGqln6c8EYAzHv3zIYHz9ttb0WPoyhCysDwpOqTnI-xPbgNTL0sIJRDK-l4OsaXraEo8hWnDzmq1zLD29zlhgkabE8Nt99H39twcjRBwCh9wxz6tg';
+  final String _defaultLogoUrl = 'assets/images/logo.png';
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +66,9 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                               boxShadow: [BoxShadow(color: Colors.blue.withOpacity(0.1), blurRadius: 20)],
                               border: Border.all(color: Colors.blue.withOpacity(0.2)),
                             ),
-                            child: Image.network(
-                              _defaultLogoUrl,
-                              fit: BoxFit.contain,
-                            ),
+                            child: _defaultLogoUrl.startsWith('assets/')
+                              ? Image.asset(_defaultLogoUrl, fit: BoxFit.contain)
+                              : Image.network(_defaultLogoUrl, fit: BoxFit.contain),
                           ),
                           const SizedBox(height: 32),
                           const Text(
