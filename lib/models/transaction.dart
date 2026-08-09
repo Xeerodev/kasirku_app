@@ -41,6 +41,7 @@ class TransactionModel {
   final String paymentMethod;
   final String cashierName;
   final String status;
+  final String? proofPhoto; // Tambahkan field untuk foto bukti
 
   TransactionModel({
     required this.id,
@@ -57,6 +58,7 @@ class TransactionModel {
     required this.paymentMethod,
     required this.cashierName,
     this.status = 'Lunas',
+    this.proofPhoto,
   });
 
   TransactionModel copyWith({
@@ -77,6 +79,7 @@ class TransactionModel {
       paymentMethod: paymentMethod,
       cashierName: cashierName,
       status: status ?? this.status,
+      proofPhoto: proofPhoto,
     );
   }
 
@@ -96,6 +99,7 @@ class TransactionModel {
       'paymentMethod': paymentMethod,
       'cashierName': cashierName,
       'status': status,
+      'proofPhoto': proofPhoto,
     };
   }
 
@@ -118,6 +122,7 @@ class TransactionModel {
       paymentMethod: json['paymentMethod'] ?? 'Tunai',
       cashierName: json['cashierName'] ?? 'Kasir 1',
       status: json['status'] ?? 'Lunas',
+      proofPhoto: json['proofPhoto'],
     );
   }
 }

@@ -658,7 +658,11 @@ class _PosScreenState extends State<PosScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: (paymentMethod == 'Tunai' && cashAmount < provider.cartTotal) ? null : () {
-                       final trx = provider.checkout(paymentAmount: cashAmount, paymentMethod: paymentMethod);
+                       final trx = provider.checkout(
+                         paymentAmount: cashAmount, 
+                         paymentMethod: paymentMethod,
+                         proofPhoto: paymentMethod == 'Kartu' ? proofPhotoBase64 : null,
+                       );
                        Navigator.pop(ctx);
                        if (trx != null) {
                          _showSuccessReceipt(context, trx, provider, cashAmount);

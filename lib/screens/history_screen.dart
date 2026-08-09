@@ -247,7 +247,45 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                          // Paper Receipt Simulation
+                        if (tx.paymentMethod == 'Kartu' && tx.proofPhoto != null && tx.proofPhoto!.isNotEmpty) ...[
+                          Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF5FAFF),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: isDark ? Colors.white10 : Colors.blue.withOpacity(0.1)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.photo, size: 16, color: Color(0xFF0D47A1)),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        lang == 'Indonesia' ? 'Bukti Transaksi Kartu' : 'Card Transaction Proof',
+                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                                  child: Image.memory(
+                                    base64Decode(tx.proofPhoto!),
+                                    width: double.infinity,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        // Paper Receipt Simulation
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),

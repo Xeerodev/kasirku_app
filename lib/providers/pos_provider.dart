@@ -310,6 +310,7 @@ class PosProvider with ChangeNotifier {
   TransactionModel? checkout({
     required double paymentAmount,
     required String paymentMethod,
+    String? proofPhoto,
   }) {
     if (_cart.isEmpty || paymentAmount < cartTotal) return null;
 
@@ -347,6 +348,7 @@ class PosProvider with ChangeNotifier {
       paymentMethod: paymentMethod,
       cashierName: _storeProfile.cashierName,
       status: 'Lunas',
+      proofPhoto: proofPhoto,
     );
 
     _transactions.insert(0, newTransaction);
