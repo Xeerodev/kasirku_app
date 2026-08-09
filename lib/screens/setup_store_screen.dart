@@ -214,19 +214,60 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kata sandi terlalu pendek!'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating));
                             return;
                           }
+
+                          // Check if a backup exists for this cashier and password
+                          final backup = provider.findBackup(_cashierController.text, _passwordController.text);
                           
-                          provider.updateStoreProfile(
-                            StoreProfile(
-                              name: _nameController.text,
-                              address: _addressController.text,
-                              phone: _phoneController.text,
-                              cashierName: _cashierController.text,
-                              logoUrl: _logoBase64.isEmpty ? _defaultLogoUrl : _logoBase64,
-                              isConfigured: true,
-                            ),
-                            password: _passwordController.text,
-                          );
-                          provider.login();
+                          if (backup != null) {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Data Backup Ditemukan'),
+                                content: Text('Data lama untuk kasir "${_cashierController.text}" ditemukan. Ingin memulihkan data tersebut?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(ctx);
+                                      // Proceed with new store (will overwrite existing backup if same cashier)
+                                      provider.updateStoreProfile(
+                                        StoreProfile(
+                                          name: _nameController.text,
+                                          address: _addressController.text,
+                                          phone: _phoneController.text,
+                                          cashierName: _cashierController.text,
+                                          logoUrl: _logoBase64.isEmpty ? _defaultLogoUrl : _logoBase64,
+                                          isConfigured: true,
+                                        ),
+                                        password: _passwordController.text,
+                                      );
+                                      provider.login();
+                                    },
+                                    child: const Text('Mulai Baru'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(ctx);
+                                      provider.restoreBackup(backup);
+                                    },
+                                    child: const Text('Pulihkan Data'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            provider.updateStoreProfile(
+                              StoreProfile(
+                                name: _nameController.text,
+                                address: _addressController.text,
+                                phone: _phoneController.text,
+                                cashierName: _cashierController.text,
+                                logoUrl: _logoBase64.isEmpty ? _defaultLogoUrl : _logoBase64,
+                                isConfigured: true,
+                              ),
+                              password: _passwordController.text,
+                            );
+                            provider.login();
+                          }
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0D47A1), foregroundColor: Colors.white, minimumSize: const Size.fromHeight(56), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)), elevation: 4),
                         child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Mulai Sekarang', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), SizedBox(width: 12), Icon(Icons.arrow_forward)]),

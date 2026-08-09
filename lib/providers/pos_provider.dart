@@ -22,6 +22,7 @@ class PosProvider with ChangeNotifier {
   bool _isDarkMode = false;
   bool _isLoggedIn = false;
   String _adminPassword = '123456';
+  List<Map<String, dynamic>> _backups = [];
 
   // Settings matching React
   String _activePrinter = 'Epson TM-T82X (USB)';
@@ -203,6 +204,26 @@ class PosProvider with ChangeNotifier {
     _loadFromPrefs();
   }
 
+  bool loginWithCredentials(String cashierName, String password) {
+    // 1. Check current active profile
+    if (_storeProfile.cashierName.toLowerCase() == cashierName.toLowerCase() && 
+        _adminPassword == password) {
+      _isLoggedIn = true;
+      _saveToPrefs();
+      notifyListeners();
+      return true;
+    }
+
+    // 2. Check backups
+    final backup = findBackup(cashierName, password);
+    if (backup != null) {
+      restoreBackup(backup);
+      return true;
+    }
+
+    return false;
+  }
+
   void login() {
     _isLoggedIn = true;
     _saveToPrefs();
@@ -368,21 +389,35 @@ class PosProvider with ChangeNotifier {
   }
 
   void updateStoreProfile(StoreProfile profile, {String? password}) {
-    // If we are configuring for the first time or re-configuring, 
-    // we should ensure a clean slate if profile.isConfigured is true
-    if (profile.isConfigured) {
-      _products = [];
-      _transactions = [];
-      _cart.clear();
-    }
-    
+    // If we are starting fresh from setup (not restoring), we don't clear here 
+    // because resetAllData/prepareForNewSetup already did it if necessary.
     _storeProfile = profile;
     if (password != null) _adminPassword = password;
     _saveToPrefs();
     notifyListeners();
   }
 
-  Future<void> resetAllData() async {
+  Future<void> prepareForNewSetup() async {
+    // Save current active data to backups before clearing
+    if (_storeProfile.isConfigured) {
+      final currentData = {
+        'storeProfile': _storeProfile.toJson(),
+        'products': _products.map((p) => p.toJson()).toList(),
+        'transactions': _transactions.map((t) => t.toJson()).toList(),
+        'password': _adminPassword,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
+      
+      // Remove old backup for same cashier if exists to update it
+      _backups.removeWhere((b) => 
+        b['storeProfile']['cashierName'].toString().toLowerCase() == 
+        _storeProfile.cashierName.toLowerCase()
+      );
+      
+      _backups.add(currentData);
+    }
+
+    // Clear active state
     _products = [];
     _transactions = [];
     _cart.clear();
@@ -395,9 +430,56 @@ class PosProvider with ChangeNotifier {
       isConfigured: false,
     );
     _adminPassword = '123456';
+    _isLoggedIn = false;
+    
+    await _saveToPrefs();
+    notifyListeners();
+  }
+
+  Map<String, dynamic>? findBackup(String cashierName, String password) {
+    try {
+      return _backups.firstWhere(
+        (b) => 
+          b['storeProfile']['cashierName'].toString().toLowerCase() == cashierName.toLowerCase() &&
+          b['password'] == password,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void restoreBackup(Map<String, dynamic> backup) {
+    _storeProfile = StoreProfile.fromJson(backup['storeProfile']);
+    _adminPassword = backup['password'];
+    
+    final List prodList = backup['products'];
+    _products = prodList.map((item) => Product.fromJson(item)).toList();
+    
+    final List trxList = backup['transactions'];
+    _transactions = trxList.map((item) => TransactionModel.fromJson(item)).toList();
+    
+    _isLoggedIn = true; // Auto login on restore
+    _saveToPrefs();
+    notifyListeners();
+  }
+
+  Future<void> resetAllData() async {
+    _products = [];
+    _transactions = [];
+    _cart.clear();
+    _backups = [];
+    _storeProfile = StoreProfile(
+      name: '',
+      address: '',
+      phone: '',
+      cashierName: '',
+      logoUrl: 'assets/images/logo.png',
+      isConfigured: false,
+    );
+    _adminPassword = '123456';
     
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Wipe everything in storage
+    await prefs.clear(); // Wipe everything
     
     notifyListeners();
   }
@@ -429,6 +511,7 @@ class PosProvider with ChangeNotifier {
     prefs.setString('footerMessage', _footerMessage);
     prefs.setString('language', _language);
     prefs.setString('adminPassword', _adminPassword);
+    prefs.setString('backups', jsonEncode(_backups));
   }
 
   Future<void> _loadFromPrefs() async {
@@ -440,6 +523,12 @@ class PosProvider with ChangeNotifier {
     _footerMessage = prefs.getString('footerMessage') ?? 'Terima kasih atas kunjungan Anda!\nBarang yang sudah dibeli tidak dapat ditukar.';
     _language = prefs.getString('language') ?? 'Indonesia';
     _adminPassword = prefs.getString('adminPassword') ?? '123456';
+
+    final backupsStr = prefs.getString('backups');
+    if (backupsStr != null) {
+      final List list = jsonDecode(backupsStr);
+      _backups = list.cast<Map<String, dynamic>>();
+    }
 
     final storeStr = prefs.getString('storeProfile');
     if (storeStr != null) {

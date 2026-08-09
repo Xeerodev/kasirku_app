@@ -23,6 +23,40 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showNewSetupConfirm(BuildContext context, PosProvider provider) {
+    if (!provider.storeProfile.isConfigured) {
+      provider.prepareForNewSetup();
+      widget.onSwitchToSetup();
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Simpan Data Saat Ini?'),
+        content: const Text('Apakah Anda ingin menyimpan data toko saat ini ke cadangan (backup) sebelum mengatur toko baru?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              provider.resetAllData(); // Total Wipe
+              widget.onSwitchToSetup();
+            },
+            child: const Text('Hapus Permanen', style: TextStyle(color: Colors.red)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              provider.prepareForNewSetup(); // Backup & Clear
+              widget.onSwitchToSetup();
+            },
+            child: const Text('Cadangkan & Lanjut'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context, listen: false);
@@ -98,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: const TextStyle(color: Colors.black87),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
-                          hintText: 'Masukkan nama kasir sesuai pendaftaran',
+                          hintText: 'Nama Kasir',
                           filled: true,
                           fillColor: const Color(0xFFF8F9FF),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.black.withOpacity(0.1))),
@@ -121,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                           ),
-                          hintText: 'Masukkan password',
+                          hintText: 'Password',
                           filled: true,
                           fillColor: const Color(0xFFF8F9FF),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.black.withOpacity(0.1))),
@@ -133,9 +167,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           final inputName = _usernameController.text.trim();
                           final inputPass = _passwordController.text;
                           
-                          if (inputName.toLowerCase() == provider.storeProfile.cashierName.toLowerCase() && 
-                              inputPass == provider.adminPassword) {
-                            provider.login();
+                          if (provider.loginWithCredentials(inputName, inputPass)) {
+                            // Login success (either active or restored backup)
                           } else {
                             String error = 'Nama Kasir atau Password salah!';
                             if (inputName.isEmpty || inputPass.isEmpty) {
@@ -175,9 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              // Reset all data before starting a new setup to ensure no stale data
-                              provider.resetAllData();
-                              widget.onSwitchToSetup();
+                              _showNewSetupConfirm(context, provider);
                             },
                             child: const Text('Atur Toko Baru', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D47A1))),
                           ),
