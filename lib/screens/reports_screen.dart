@@ -150,7 +150,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ],
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    MainNavigationScreen.of(context)?.setTabIndex(2); // Index 2 is HistoryScreen
+                  },
                   child: Text(provider.tr('see_all'), style: TextStyle(color: isDark ? Colors.lightBlueAccent : const Color(0xFF0D47A1), fontSize: 12)),
                 )
               ],

@@ -1,43 +1,54 @@
-# Kasirku App (Point of Sale) - Flutter Version
+# 🏪 Kasirku App - Solusi Kasir Pintar (POS) 🚀
 
-Aplikasi Kasir Point of Sale (POS) modern yang dibangun menggunakan **Flutter Full Offline**. Aplikasi ini dirancang khusus untuk membantu UMKM atau Toko Kopi dalam mengelola transaksi, stok barang, dan laporan penjualan secara efisien dengan desain antarmuka yang bersih dan responsif.
+**Kasirku App** adalah aplikasi *Point of Sale* (POS) modern berbasis Flutter yang dirancang khusus untuk membantu UMKM mengelola penjualan, stok barang, dan laporan keuangan secara offline dengan mudah, cepat, dan aman.
 
-## Fitur Utama
-
-- **Kasir (POS):** Alur transaksi cepat dengan dukungan multi-metode pembayaran (Tunai, QRIS, Kartu/TF).
-- **Manajemen Stok:** Kelola produk, kategori, harga, dan stok barang dengan indikator stok rendah dan notifikasi pop-up.
-- **Riwayat Transaksi:** Catatan seluruh penjualan dengan detail struk belanja profesional dan fitur Refund.
-- **Laporan Penjualan:** Ringkasan pendapatan harian dalam bentuk visual Bento-style dengan fitur simulasi ekspor PDF/Excel.
-- **Pengaturan Toko:** Kustomisasi nama toko, alamat, logo (dari galeri), dan pengaturan keamanan kata sandi Kasir.
-- **Dark Mode:** Mendukung tampilan tema gelap yang elegan dengan kontras yang nyaman di mata.
-- **Full Offline:** Data tersimpan 100% di perangkat lokal, tidak membutuhkan koneksi internet.
-
-## Teknologi yang Digunakan
-
-- **Framework:** Flutter SDK
-- **State Management:** Provider
-- **Local Storage:** Shared Preferences
-- **Icons:** Material Icons & Cupertino Icons
-- **Fonts:** Google Fonts (Source Code Pro)
-- **Image Handling:** Image Picker (with auto-compression)
-
-## Cara Menjalankan Proyek
-
-Pastikan Anda sudah menginstal Flutter SDK.
-
-```bash
-# Ambil dependensi
-flutter pub get
-
-# Jalankan di Chrome (Web)
-flutter run -d chrome
-
-# Jalankan di Windows (Desktop)
-flutter run -d windows
-```
-
-## Kontribusi
-Proyek ini dikembangkan sebagai tugas UAS Semester 6 Materi Rekayasa Perangkat Lunak oleh **Xeerodev**.
+![Branding](/assets/images/logo.png)
 
 ---
-*Dibuat dengan ❤️ untuk kemajuan UMKM Indonesia.*
+
+## ✨ Fitur Unggulan
+
+### 🛡️ Keamanan & Akun Multi-Toko
+*   **Daftar Toko Mandiri**: Atur profil toko Anda sendiri (Nama, Alamat, No. HP, Logo). 📝
+*   **Login Kasir**: Setiap toko memiliki nama kasir dan kata sandi unik untuk keamanan transaksi. 🔐
+*   **Multi-Akun (Auto-Restore)**: Kelola banyak toko dalam satu perangkat! Pindah antar toko semudah login dengan nama kasir masing-masing. Sistem akan otomatis memulihkan data cadangan Anda. 🔄
+
+### 🛒 Kasir & Transaksi (POS)
+*   **Manajemen Stok Real-time**: Pantau stok barang Anda secara otomatis setiap kali ada penjualan. 📦
+*   **Kategori Dinamis**: Kategori produk menyesuaikan dengan apa yang Anda buat. Tidak terbatas! 🏷️
+*   **Metode Pembayaran Lengkap**: Mendukung pembayaran **Tunai**, **QRIS**, dan **Kartu**. 💳
+*   **Bukti Pembayaran Kartu**: Khusus pembayaran kartu, Anda bisa mengambil foto struk EDC atau bukti lainnya langsung dari kamera. 📸
+*   **Struk Digital Presisi**: Simulasi struk belanja yang rapi dan profesional. 📄
+
+### 📊 Laporan & Riwayat
+*   **Ringkasan Penjualan**: Pantau omset dan jumlah transaksi harian melalui dashboard yang informatif. 📈
+*   **Produk Terlaris**: Ketahui produk mana yang paling disukai pelanggan Anda. ⭐
+*   **Ekspor Data Profesional**: Simpan laporan penjualan dalam format **PDF** atau **Excel** langsung ke folder dokumen perangkat. 📁
+*   **Riwayat Transaksi**: Cek kembali seluruh transaksi lama lengkap dengan status (Lunas/Refund). 🕒
+
+### ⚙️ Pengaturan & Hardware
+*   **Dukungan Printer Bluetooth**: Cetak struk belanja langsung ke printer thermal Bluetooth (58mm/80mm). 🖨️
+*   **Mode Gelap (Dark Mode)**: Tampilan nyaman di mata untuk penggunaan di malam hari atau dalam ruangan minim cahaya. 🌙
+*   **Backup & Restore**: Data tersimpan aman secara offline di perangkat Anda dan bisa dicadangkan kapan saja. 💾
+
+---
+
+## 📱 Kompatibilitas Android
+Aplikasi ini dioptimalkan untuk perangkat Android (HP & Tablet) dengan dukungan penuh untuk:
+*   **Ekspor Laporan**: Berjalan mulus di folder `/Documents/Kasirku`.
+*   **Kamera & Galeri**: Izin akses untuk upload logo toko dan bukti transaksi kartu.
+*   **Printer Bluetooth**: Koneksi stabil dengan berbagai merk printer thermal.
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+*   **Framework**: Flutter (Dart) 💙
+*   **State Management**: Provider 🧩
+*   **Database**: Shared Preferences (Offline Priority) 🗄️
+*   **Export Engine**: PDF & Excel library 📑
+*   **Hardware Control**: Blue Thermal Printer SDK 🔌
+
+---
+
+> **Kasirku App** - "Membangun UMKM Indonesia yang Lebih Modern dan Terorganisir" 🇮🇩
+> *Developed with ❤️ by Xeerodev*

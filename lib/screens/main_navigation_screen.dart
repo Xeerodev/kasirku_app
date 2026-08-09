@@ -11,12 +11,19 @@ import 'settings_screen.dart';
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
 
+  static _MainNavigationScreenState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MainNavigationScreenState>();
+
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
+
+  void setTabIndex(int index) {
+    setState(() => _selectedIndex = index);
+  }
 
   final List<Widget> _screens = const [
     PosScreen(),
