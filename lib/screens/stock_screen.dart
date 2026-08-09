@@ -377,9 +377,11 @@ class _StockScreenState extends State<StockScreen> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: imageBase64.startsWith('http')
-                                  ? Image.network(imageBase64, fit: BoxFit.cover)
-                                  : Image.memory(base64Decode(imageBase64), fit: BoxFit.cover),
+                              child: imageBase64.startsWith('assets/')
+                                  ? Image.asset(imageBase64, fit: BoxFit.cover)
+                                  : imageBase64.startsWith('http')
+                                    ? Image.network(imageBase64, fit: BoxFit.cover)
+                                    : Image.memory(base64Decode(imageBase64), fit: BoxFit.cover),
                             ),
                           ),
                           Positioned(

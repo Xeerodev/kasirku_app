@@ -341,7 +341,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   image: productImage != null && productImage.isNotEmpty
                     ? (productImage.startsWith('assets/')
                       ? DecorationImage(image: AssetImage(productImage), fit: BoxFit.cover)
-                      : DecorationImage(image: NetworkImage(productImage), fit: BoxFit.cover))
+                      : productImage.startsWith('http')
+                        ? DecorationImage(image: NetworkImage(productImage), fit: BoxFit.cover)
+                        : DecorationImage(image: MemoryImage(base64Decode(productImage)), fit: BoxFit.cover))
                     : null,
                 ),
                 child: productImage == null || productImage.isEmpty
