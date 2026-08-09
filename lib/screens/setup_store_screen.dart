@@ -260,17 +260,12 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
           controller: controller,
           maxLines: maxLines,
           style: const TextStyle(fontSize: 14, color: Colors.black87),
+          textAlignVertical: maxLines > 1 ? TextAlignVertical.top : TextAlignVertical.center,
           decoration: InputDecoration(
             prefixIcon: maxLines > 1 
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 14),
-                      child: Icon(icon, color: const Color(0xFF2196F3), size: 20),
-                    ),
-                  ],
+              ? Transform.translate(
+                  offset: const Offset(0, -22), // Menarik ikon ke atas agar sejajar baris pertama
+                  child: Icon(icon, color: const Color(0xFF2196F3), size: 20),
                 )
               : Icon(icon, color: const Color(0xFF2196F3), size: 20),
             hintText: hint,
