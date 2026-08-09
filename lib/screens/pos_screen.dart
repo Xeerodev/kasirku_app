@@ -24,18 +24,11 @@ class _PosScreenState extends State<PosScreen> {
   String _searchQuery = '';
   final PrinterService _printerService = PrinterService();
 
-  final List<String> _categories = [
-    'Semua',
-    'Kopi',
-    'Kue',
-    'Merchandise',
-    'Biji Kopi',
-    'Minuman'
-  ];
-
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PosProvider>(context);
+    final List<String> categories = ['Semua', ...provider.existingCategories];
+    
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
@@ -62,7 +55,7 @@ class _PosScreenState extends State<PosScreen> {
           Container(
             padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 8),
             decoration: BoxDecoration(
-              color: provider.isDarkMode ? const Color(0xFF0B1C30) : const Color(0xFFF8F9FF),
+              color: provider.isDarkMode ? const Color(0xFF0D47A1).withOpacity(0.05) : const Color(0xFFF8F9FF),
               border: Border(bottom: BorderSide(color: provider.isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05))),
             ),
             child: Column(
@@ -137,7 +130,7 @@ class _PosScreenState extends State<PosScreen> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: _categories.map((cat) {
+                    children: categories.map((cat) {
                       final isSelected = _selectedCategory == cat;
                       final catDisplay = cat == 'Semua' ? (provider.language == 'Indonesia' ? 'Semua' : 'All') : cat;
                       return Padding(

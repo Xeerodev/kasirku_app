@@ -188,7 +188,7 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                       const SizedBox(height: 20),
                       _buildLabelField('Nama Toko', Icons.storefront, _nameController, 'cth. Kedai Kopi Sentral'),
                       const SizedBox(height: 16),
-                      _buildLabelField('Alamat Toko', Icons.location_on, _addressController, 'Alamat jalan lengkap', maxLines: 2),
+                      _buildLabelField('Alamat Toko', Icons.location_on, _addressController, 'Alamat jalan lengkap'),
                       const SizedBox(height: 16),
                       _buildLabelField('Nomor HP', Icons.call, _phoneController, 'cth. 081234567890'),
 
@@ -260,22 +260,16 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
           controller: controller,
           maxLines: maxLines,
           style: const TextStyle(fontSize: 14, color: Colors.black87),
-          textAlignVertical: maxLines > 1 ? TextAlignVertical.top : TextAlignVertical.center,
           decoration: InputDecoration(
-            prefixIcon: maxLines > 1 
-              ? Transform.translate(
-                  offset: const Offset(0, -22), // Menarik ikon ke atas agar sejajar baris pertama
-                  child: Icon(icon, color: const Color(0xFF2196F3), size: 20),
-                )
-              : Icon(icon, color: const Color(0xFF2196F3), size: 20),
+            prefixIcon: Icon(icon, color: const Color(0xFF2196F3), size: 20),
             hintText: hint,
             hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF2196F3))),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: const Color(0xFF2196F3).withOpacity(0.5))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF0D47A1), width: 2)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Color(0xFF0D47A1), width: 2)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
         ),
       ],
