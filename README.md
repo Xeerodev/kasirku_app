@@ -1,4 +1,4 @@
-# Kasirku POS (Point of Sale) - Flutter Version
+# Kasirku App (Point of Sale) - Flutter Version
 
 Aplikasi Kasir Point of Sale (POS) modern yang dibangun menggunakan **Flutter Full Offline**. Aplikasi ini dirancang khusus untuk membantu UMKM atau Toko Kopi dalam mengelola transaksi, stok barang, dan laporan penjualan secara efisien dengan desain antarmuka yang bersih dan responsif.
 

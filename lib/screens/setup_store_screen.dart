@@ -106,7 +106,10 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
                 // Right Form
                 Container(
                   width: width > 800 ? 500 : double.infinity,
-                  padding: EdgeInsets.all(width > 800 ? 50 : 24),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width > 800 ? 50 : 24,
+                    vertical: width > 800 ? 50 : 40,
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -258,7 +261,18 @@ class _SetupStoreScreenState extends State<SetupStoreScreen> {
           maxLines: maxLines,
           style: const TextStyle(fontSize: 14, color: Colors.black87),
           decoration: InputDecoration(
-            prefixIcon: Padding(padding: EdgeInsets.only(bottom: maxLines > 1 ? 40 : 0), child: Icon(icon, color: const Color(0xFF2196F3), size: 20)),
+            prefixIcon: maxLines > 1 
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 14),
+                      child: Icon(icon, color: const Color(0xFF2196F3), size: 20),
+                    ),
+                  ],
+                )
+              : Icon(icon, color: const Color(0xFF2196F3), size: 20),
             hintText: hint,
             hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
             filled: true,
